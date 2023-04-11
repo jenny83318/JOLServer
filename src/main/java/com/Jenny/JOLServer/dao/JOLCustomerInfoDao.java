@@ -13,7 +13,7 @@ import com.Jenny.JOLServer.model.Customer;
 public interface JOLCustomerInfoDao extends JpaRepository<Customer, Integer>{
 	
 	 List<Customer> findAll();
-	
+	 
 
 }
 
