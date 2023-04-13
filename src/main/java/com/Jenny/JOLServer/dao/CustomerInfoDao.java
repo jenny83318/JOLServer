@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.Jenny.JOLServer.model.Customer;
 
 @Repository
-public interface CustomerInfoDao extends JpaRepository<Customer, Long>{
+public interface CustomerInfoDao extends JpaRepository<Customer, Integer> {
+	Customer findByAccount(String account);
 
 }
