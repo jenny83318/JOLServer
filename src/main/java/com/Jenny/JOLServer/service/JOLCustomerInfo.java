@@ -17,7 +17,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /*
+ * Request JSON
 {
+    "account":"jenny83318",
+    "body":{
     "type":0,
     "account": "abc1235",
     "password": "vjsklemmr",
@@ -32,14 +35,22 @@ public class JOLCustomerInfo {
 	private static final Logger log = LoggerFactory.getLogger(JOLCustomerInfo.class);
 	@Autowired
 	private CustomerInfoDao custDao;
-
+	
 	@Data
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class IN {
-		private Integer type;// 0:查全部、1:查單一、2:新增、3:編輯、4刪除
+	public static class REQUEST {
 		private String account;
+		private BODY body;
+	
+	}
+	@Data
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class BODY {	
+		private Integer type;// 0:查全部、1:查單一、2:新增、3:編輯、4刪除
 		private String password;
 		private String name;
 		private String phone;
@@ -52,31 +63,21 @@ public class JOLCustomerInfo {
 	@Builder
 	public static class OUT {
 		private String result;
-		private List<CUSTOMER> custList;
+		private List<Customer> custList;
 	}
 
-	@Data
-	@Builder
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class CUSTOMER {
-		private String account;
-		private String password;
-		private String name;
-		private String phone;
-		private String email;
-		private String address;
-		private Integer status;
+	protected REQUEST check(REQUEST req) throws Exception  {
+		if(req.account.isEmpty()) {
+			throw new Exception("PARAM NOT FOUND: account");
+		}
+		return req;
 	}
-
-	public OUT doProcess(IN in) {
-		List<CUSTOMER> custList = new ArrayList<CUSTOMER>();
-		if (in.getType() == 0) {
-			List<Customer> custData = custDao.findAll();
-			for (Customer c : custData) {
-				custList.add(CUSTOMER.builder().account(c.getAccount()).password(c.getPassword()).name(c.getName())
-						.phone(c.getPhone()).email(c.getEmail()).address(c.getAddress()).status(c.getStatus()).build());
-			}
+	public OUT doProcess(REQUEST req) throws Exception {
+		check(req);
+		log.info("REQ:{}", req);
+		List<Customer> custList = new ArrayList<Customer>();
+		if (req.getBody().getType() == 0) {
+			custList = custDao.findAll();
 		}
 		return OUT.builder().custList(custList).result("success").build();
 

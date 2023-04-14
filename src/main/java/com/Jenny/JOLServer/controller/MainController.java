@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Jenny.JOLServer.service.JOLCustomerInfo;
+import com.Jenny.JOLServer.service.JOLCustomerInfo.REQUEST;
 @RequestMapping("/api/json")
 @RestController
 public class MainController {
@@ -15,8 +16,9 @@ public class MainController {
 	private JOLCustomerInfo custService;	
 	
 	@PostMapping("/customer")
-	public JOLCustomerInfo.OUT CustomerInfo(@RequestBody JOLCustomerInfo.IN in){
-		return custService.doProcess(in);
+	public JOLCustomerInfo.OUT CustomerInfo(@RequestBody REQUEST req) throws Exception{
+		return custService.doProcess(req);
 	}
+
 	
 }
