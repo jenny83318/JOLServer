@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "JOL_CustomerInfo")
+@Table(name = "jol_customer")
 @Data
 @Builder
 @NoArgsConstructor
@@ -24,4 +24,5 @@ public class Customer {
 	private String email;
 	private String address;
 	private Integer status;
+	private String payment;
 }

@@ -1,15 +1,18 @@
-CREATE TABLE `JOL_CustomerInfo` (
+use joldb;
+SHOW VARIABLES LIKE 'lower_case_table_names';
+CREATE TABLE `jol_customer` (
 	`account` char(45) NOT NULL UNIQUE,
 	`password` char(45) NOT NULL,
 	`email` char(100) NOT NULL UNIQUE,
 	`phone` char(45) NOT NULL,
+	`name` char(45) NOT NULL,
 	`address` char(150) NOT NULL,
 	`status` BOOLEAN NOT NULL,
-	`payment` char NOT NULL,
+	`payment` char(45) NOT NULL,
 	PRIMARY KEY (`account`)
 );
 
-CREATE TABLE `JOL_ProductInfo` (
+CREATE TABLE `jol_product` (
 	`prodId` int(11) NOT NULL AUTO_INCREMENT,
 	`name` char(50) NOT NULL,
 	`descript` char(100),
@@ -24,7 +27,7 @@ CREATE TABLE `JOL_ProductInfo` (
 	PRIMARY KEY (`prodId`)
 );
 
-CREATE TABLE `JOL_OrderInfo` (
+CREATE TABLE `jol_order` (
 	`orderNo` int NOT NULL AUTO_INCREMENT UNIQUE,
 	`account` char(45) NOT NULL UNIQUE,
 	`prodId` int NOT NULL,
@@ -37,7 +40,7 @@ CREATE TABLE `JOL_OrderInfo` (
 	PRIMARY KEY (`orderNo`)
 );
 
-CREATE TABLE `JOL_CartInfo` (
+CREATE TABLE `jol_cart` (
 	`cartId` int NOT NULL AUTO_INCREMENT,
 	`prodId` int NOT NULL,
 	`account` char(45) NOT NULL,
@@ -47,7 +50,7 @@ CREATE TABLE `JOL_CartInfo` (
 	PRIMARY KEY (`cartId`)
 );
 
-CREATE TABLE `JOL_Setting` (
+CREATE TABLE `jol_setting` (
 	`type` char(45) NOT NULL,
 	`keyName` char(45) NOT NULL,
 	`value` char(50) NOT NULL,
@@ -59,7 +62,7 @@ CREATE TABLE `JOL_Setting` (
 	PRIMARY KEY (`type`,`keyName`)
 );
 
-CREATE TABLE `JOL_Employee` (
+CREATE TABLE `jol_employee` (
 	`empNo` int NOT NULL AUTO_INCREMENT UNIQUE,
 	`account` char(45) NOT NULL UNIQUE,
 	`name` char(45) NOT NULL,
@@ -80,10 +83,4 @@ ALTER TABLE `JOL_OrderInfo` ADD CONSTRAINT `JOL_OrderInfo_fk0` FOREIGN KEY (`acc
 ALTER TABLE `JOL_OrderInfo` ADD CONSTRAINT `JOL_OrderInfo_fk1` FOREIGN KEY (`prodId`) REFERENCES `JOL_ProductInfo`(`prodId`);
 
 ALTER TABLE `JOL_CartInfo` ADD CONSTRAINT `JOL_CartInfo_fk0` FOREIGN KEY (`prodId`) REFERENCES `JOL_ProductInfo`(`prodId`);
-
-
-
-
-
-
 
