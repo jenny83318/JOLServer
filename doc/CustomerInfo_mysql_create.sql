@@ -1,16 +1,21 @@
 use joldb;
 SHOW VARIABLES LIKE 'lower_case_table_names';
 CREATE TABLE `jol_customer` (
-	`account` char(45) NOT NULL UNIQUE,
-	`password` char(45) NOT NULL,
-	`email` char(100) NOT NULL UNIQUE,
-	`phone` char(45) NOT NULL,
-	`name` char(45) NOT NULL,
-	`address` char(150) NOT NULL,
-	`status` BOOLEAN NOT NULL,
-	`payment` char(45) NOT NULL,
-	PRIMARY KEY (`account`)
-);
+  `account` char(45) NOT NULL,
+  `password` char(45) NOT NULL,
+  `email` char(100) NOT NULL,
+  `phone` char(45) NOT NULL,
+  `name` char(45) NOT NULL,
+  `address` char(150) NOT NULL,
+  `status` tinyint(1) NOT NULL,
+  `payment` char(45) NOT NULL,
+  `token` varchar(100) DEFAULT NULL,
+  `token_expired` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`account`),
+  UNIQUE KEY `account` (`account`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `token_UNIQUE` (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 
 CREATE TABLE `jol_product` (
 	`prodId` int(11) NOT NULL AUTO_INCREMENT,
