@@ -1,5 +1,10 @@
 package com.Jenny.JOLServer.service;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,19 +31,11 @@ public class LogIn {
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class REQUEST {
-		private String account;
-		private BODY body;
-	}
-	@Data
-	@Builder
-	@NoArgsConstructor
-	@AllArgsConstructor
 	public static class BODY {
 		private String password;
 		private String token;
 	}
-	
+
 	@Data
 	@Builder
 	public static class OUT {
@@ -47,32 +44,40 @@ public class LogIn {
 		private String token;
 		private String tokenExpired;
 	}
-	
+
 	public BODY parser(Map<String, Object> map) {
-		 ModelMapper modelMapper = new ModelMapper();
-	     BODY body = modelMapper.map(map, BODY.class);
+		ModelMapper modelMapper = new ModelMapper();
+		BODY body = modelMapper.map(map, BODY.class);
 		return body;
 	}
 
 	public OUT doProcess(Request req) throws Exception {
 		BODY body = parser(req.getBody());
-		Customer c = custDao.findByAccountAndPassword(req.getAccount(),body.getPassword());
+		Customer c = custDao.findByAccountAndPassword(req.getAccount(), body.getPassword());
 		OUT out = OUT.builder().build();
-		if(c != null) {
-			if(c.getToken() == null) {
+		if (c != null) {
+			if (c.getToken() == null) {
 				String token = UUID.randomUUID().toString();
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(new Date());
+				calendar.add(Calendar.HOUR_OF_DAY, 24);
+				String nextDayStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
+				c.setTokenExpired(nextDayStr);
 				c.setToken(token);
 				Customer updCust = custDao.save(c);
 				out = OUT.builder().code(HttpStatus.OK.value()).msg("Success").token(updCust.getToken()).tokenExpired(updCust.getTokenExpired()).build();
-			}else {
-				if(c.getToken().equals(body.getToken())) {
-					out= OUT.builder().code(HttpStatus.OK.value()).msg("Success").token(c.getToken()).tokenExpired(c.getTokenExpired()).build();
-				}else {
+			} else {
+				if (c.getToken().equals(body.getToken())) {
+			        LocalDateTime expired = LocalDateTime.parse(c.getTokenExpired(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+					int code = LocalDateTime.now().isAfter(expired) ? 777 : HttpStatus.OK.value();
+					String msg = code == 777 ? "token is expired" : "Success";
+					out = OUT.builder().code(code).msg(msg).token(c.getToken()).tokenExpired(c.getTokenExpired()).build();
+				} else {
 					out = OUT.builder().code(999).msg("Fail").token(c.getToken()).tokenExpired(c.getTokenExpired()).build();
 				}
 			}
-		}else {
-			out = OUT.builder().code(555).msg("Not found").token(null).tokenExpired(null).build();
+		} else {
+			out = OUT.builder().code(555).msg("Account or Password Error").token(null).tokenExpired(null).build();
 		}
 		return out;
 	}

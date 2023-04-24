@@ -107,6 +107,7 @@ public class JOLCustomerInfo {
 	     BODY body = modelMapper.map(map, BODY.class);
 		return body;
 	}
+	
 	public OUT doProcess(Request req) throws Exception {
 		check(req);
 		BODY body = parser(req.getBody());

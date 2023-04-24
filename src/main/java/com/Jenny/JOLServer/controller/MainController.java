@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.Jenny.JOLServer.model.Fun;
 import com.Jenny.JOLServer.model.Request;
 import com.Jenny.JOLServer.service.JOLCustomerInfo;
 import com.Jenny.JOLServer.service.LogIn;
@@ -26,15 +27,16 @@ public class MainController {
 			throw new CustomException("PARAM NOT FOUND: fun");
 		}
 		Object out = new Object();
-		if("JOLCustomerInfo".equals(req.getFun())) {
-			out = custService.doProcess(req);
-		}
-		if("LogIn".equals(req.getFun())){
-			out = logIn.doProcess(req);
+		Fun fun = Fun.getFunValue(req.getFun());
+		switch (fun) {
+		    case LOGIN:
+		    	out = logIn.doProcess(req);
+		        break;
+		    case CUSTOMER:
+		    	out = custService.doProcess(req);
+		        break;
+		
 		}
 		return out;
 	}
-
-	
-	
 }
