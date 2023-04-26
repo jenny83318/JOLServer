@@ -78,9 +78,9 @@ CREATE TABLE `jol_employee` (
 	PRIMARY KEY (`empNo`)
 );
 
-ALTER TABLE `JOL_OrderInfo` ADD CONSTRAINT `JOL_OrderInfo_fk0` FOREIGN KEY (`account`) REFERENCES `JOL_CustomerInfo`(`account`);
+ALTER TABLE `jol_order` ADD CONSTRAINT `jol_order_fk0` FOREIGN KEY (`account`) REFERENCES `jol_customer`(`account`);
 
-ALTER TABLE `JOL_OrderInfo` ADD CONSTRAINT `JOL_OrderInfo_fk1` FOREIGN KEY (`prodId`) REFERENCES `JOL_ProductInfo`(`prodId`);
+ALTER TABLE `jol_order` ADD CONSTRAINT `jol_order_fk1` FOREIGN KEY (`prodId`) REFERENCES `jol_product`(`prodId`);
 
-ALTER TABLE `JOL_CartInfo` ADD CONSTRAINT `JOL_CartInfo_fk0` FOREIGN KEY (`prodId`) REFERENCES `JOL_ProductInfo`(`prodId`);
+ALTER TABLE `jol_cart` ADD CONSTRAINT `jol_cart_fk0` FOREIGN KEY (`prodId`) REFERENCES `jol_product`(`prodId`);
 
