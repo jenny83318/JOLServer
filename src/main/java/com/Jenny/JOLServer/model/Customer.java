@@ -1,5 +1,8 @@
 package com.Jenny.JOLServer.model;
 
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -25,4 +28,7 @@ public class Customer {
 	private String address;
 	private Integer status;
 	private String payment;
+	private String token;
+	@Column(name = "token_expired")
+	private String tokenExpired;
 }

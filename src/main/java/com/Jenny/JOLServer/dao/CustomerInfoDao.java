@@ -15,6 +15,7 @@ public interface CustomerInfoDao extends JpaRepository<Customer, Integer> {
 	public static final String DELETE_BY_ACCOUNT = "delete from jol_customer where account = :account";
 	
 	Customer findByAccount(String account);
+	Customer findByAccountAndPassword(String account, String password);
 	
     @Modifying
     @Query(value = DELETE_BY_ACCOUNT, nativeQuery = true)

@@ -2,7 +2,9 @@ package com.Jenny.JOLServer.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.Jenny.JOLServer.dao.CustomerInfoDao;
 import com.Jenny.JOLServer.model.Customer;
+import com.Jenny.JOLServer.model.Request;
 import com.Jenny.JOLServer.tool.CustomException;
 
 import lombok.AllArgsConstructor;
@@ -42,16 +45,6 @@ public class JOLCustomerInfo {
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class REQUEST {
-		private String account;
-		private BODY body;
-
-	}
-
-	@Data
-	@Builder
-	@NoArgsConstructor
-	@AllArgsConstructor
 	public static class BODY {
 		private Integer type;// 0:查全部、1:查單一、2:新增、3:編輯、4刪除
 		private String password;
@@ -71,58 +64,72 @@ public class JOLCustomerInfo {
 		private List<Customer> custList;
 	}
 
-	protected REQUEST check(REQUEST req) throws Exception {
-		if (req.getBody().getType() == null) {
+	protected Request check(Request req) throws Exception {
+		if (req.getAccount().isEmpty()) {
+			throw new CustomException("PARAM NOT FOUND: account");
+		}
+		if (req.getFun().isEmpty()) {
+			throw new CustomException("PARAM NOT FOUND: fun");
+		}
+		if (req.getBody().get("type") == null) {
 			throw new CustomException("PARAM NOT FOUND: type");
 		}
-		if (req.getBody().getType() != 0) {
-			if (req.account.isEmpty()) {
+		if ((int)req.getBody().get("type") != 0) {
+			if (req.getAccount().isEmpty()) {
 				throw new CustomException("PARAM NOT FOUND: account");
 			}
 		}
-		if (req.getBody().getType() == 2 || req.getBody().getType() == 3) {
-			if (req.getBody().getEmail().isEmpty()) {
+		if ((int)req.getBody().get("type") == 2 || (int)req.getBody().get("type") == 3) {
+			if (req.getBody().get("email") == null) {
 				throw new CustomException("PARAM NOT FOUND: email");
 			}
-			if (req.getBody().getPassword().isEmpty()) {
+			if (req.getBody().get("password") == null) {
 				throw new CustomException("PARAM NOT FOUND: password");
 			}
-			if (req.getBody().getName().isEmpty()) {
+			if (req.getBody().get("name") == null) {
 				throw new CustomException("PARAM NOT FOUND: name");
 			}
-			if (req.getBody().getAddress().isEmpty()) {
+			if (req.getBody().get("address") == null ) {
 				throw new CustomException("PARAM NOT FOUND: address");
 			}
-			if (req.getBody().getPhone().isEmpty()) {
+			if (req.getBody().get("phone") == null) {
 				throw new CustomException("PARAM NOT FOUND: phone");
 			}
-			if (req.getBody().getStatus() == null) {
+			if (req.getBody().get("status") == null) {
 				throw new CustomException("PARAM NOT FOUND: status");
 			}
 		}
 		return req;
 	}
-
-	public OUT doProcess(REQUEST req) throws Exception {
+	
+	public BODY parser(Map<String, Object> map) {
+		 ModelMapper modelMapper = new ModelMapper();
+	     BODY body = modelMapper.map(map, BODY.class);
+		return body;
+	}
+	
+	public OUT doProcess(Request req) throws Exception {
 		check(req);
+		BODY body = parser(req.getBody());
 		List<Customer> custList = new ArrayList<Customer>();
-		if (req.getBody().getType() == 0) {
+		if (body.getType() == 0) {
 			custList = custDao.findAll();
 		}
-		if (req.getBody().getType() == 1) {
-			custList.add(custDao.findByAccount(req.getAccount()));
+		if (body.getType() == 1) {
+			Customer c = custDao.findByAccount(req.getAccount());
+			custList.add(c == null ? Customer.builder().build() : c );
 		}
-		if (req.getBody().getType() == 2 || req.getBody().getType() == 3) {
+		if (body.getType() == 2 || body.getType() == 3) {
 			Customer cust = custDao.findByAccount(req.getAccount());
-			if (req.getBody().getType() == 2 && cust != null ) {
+			if (body.getType() == 2 && cust != null ) {
 				throw new CustomException("此帳號已存在，無法新增");
-			} else if (req.getBody().getType() == 3 && cust == null){
+			} else if (body.getType() == 3 && cust == null){
 				throw new CustomException("此帳號不存在，無法更新");
 			} else {
-				Customer c = Customer.builder().account(req.getAccount()).address(req.getBody().address)
-						.email(req.getBody().getEmail()).name(req.getBody().getName())
-						.password(req.getBody().getPassword()).phone(req.getBody().getPhone())
-						.status(req.getBody().getStatus()).payment(req.getBody().getPayment()).build();
+				Customer c = Customer.builder().account(req.getAccount()).address(body.address)
+						.email(body.getEmail()).name(body.getName())
+						.password(body.getPassword()).phone(body.getPhone())
+						.status(body.getStatus()).payment(body.getPayment()).build();
 				Customer updCustomer = custDao.save(c);
 				if (updCustomer != null) {
 					custList.add(updCustomer);
@@ -131,7 +138,7 @@ public class JOLCustomerInfo {
 				}
 			}
 		}
-		if (req.getBody().getType() == 4 ) {
+		if (body.getType() == 4 ) {
 			custDao.deleteByAccount(req.getAccount());
 		}
 		log.info("custList:{}", custList);
