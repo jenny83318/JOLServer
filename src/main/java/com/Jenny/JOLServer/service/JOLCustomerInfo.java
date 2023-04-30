@@ -34,6 +34,7 @@ import lombok.NoArgsConstructor;
     "email": "wewwwwwwww",
     "status": 1
 }
+}
  */
 @Service
 public class JOLCustomerInfo {
