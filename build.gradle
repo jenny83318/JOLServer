@@ -22,6 +22,7 @@ dependencies {
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'mysql:mysql-connector-java:8.0.30'
+	implementation 'commons-io:commons-io:2.11.0'
 	runtimeOnly group: 'mysql', name: 'mysql-connector-java'
 	compileOnly 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'

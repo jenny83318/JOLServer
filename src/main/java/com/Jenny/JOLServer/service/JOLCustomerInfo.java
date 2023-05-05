@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.Jenny.JOLServer.common.Type;
 import com.Jenny.JOLServer.dao.CustomerInfoDao;
 import com.Jenny.JOLServer.model.Customer;
 import com.Jenny.JOLServer.model.Request;
@@ -39,6 +40,7 @@ import lombok.NoArgsConstructor;
 @Service
 public class JOLCustomerInfo {
 	private static final Logger log = LoggerFactory.getLogger(JOLCustomerInfo.class);
+
 	@Autowired
 	private CustomerInfoDao custDao;
 
@@ -47,7 +49,7 @@ public class JOLCustomerInfo {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class BODY {
-		private Integer type;// 0:查全部、1:查單一、2:新增、3:編輯、4刪除
+		private String type;// 0:查全部、1:查單一、2:新增、3:編輯、4刪除
 		private String password;
 		private String name;
 		private String phone;
@@ -75,12 +77,7 @@ public class JOLCustomerInfo {
 		if (req.getBody().get("type") == null) {
 			throw new CustomException("PARAM NOT FOUND: type");
 		}
-		if ((int)req.getBody().get("type") != 0) {
-			if (req.getAccount().isEmpty()) {
-				throw new CustomException("PARAM NOT FOUND: account");
-			}
-		}
-		if ((int)req.getBody().get("type") == 2 || (int)req.getBody().get("type") == 3) {
+		if ("ADD".equals(req.getBody().get("type")) || "UPDATE".equals(req.getBody().get("type"))) {
 			if (req.getBody().get("email") == null) {
 				throw new CustomException("PARAM NOT FOUND: email");
 			}
@@ -90,7 +87,7 @@ public class JOLCustomerInfo {
 			if (req.getBody().get("name") == null) {
 				throw new CustomException("PARAM NOT FOUND: name");
 			}
-			if (req.getBody().get("address") == null ) {
+			if (req.getBody().get("address") == null) {
 				throw new CustomException("PARAM NOT FOUND: address");
 			}
 			if (req.getBody().get("phone") == null) {
@@ -102,45 +99,54 @@ public class JOLCustomerInfo {
 		}
 		return req;
 	}
-	
+
 	public BODY parser(Map<String, Object> map) {
-		 ModelMapper modelMapper = new ModelMapper();
-	     BODY body = modelMapper.map(map, BODY.class);
+		ModelMapper modelMapper = new ModelMapper();
+		BODY body = modelMapper.map(map, BODY.class);
 		return body;
 	}
-	
+
 	public OUT doProcess(Request req) throws Exception {
 		check(req);
 		BODY body = parser(req.getBody());
 		List<Customer> custList = new ArrayList<Customer>();
-		if (body.getType() == 0) {
+		Type type = Type.getType(body.getType());
+		switch (type) {
+		case ALL:
 			custList = custDao.findAll();
-		}
-		if (body.getType() == 1) {
+			break;
+		case SELECT:
 			Customer c = custDao.findByAccount(req.getAccount());
-			custList.add(c == null ? Customer.builder().build() : c );
-		}
-		if (body.getType() == 2 || body.getType() == 3) {
+			custList.add(c == null ? Customer.builder().build() : c);
+			break;
+		case ADD:
+		case UPDATE:
 			Customer cust = custDao.findByAccount(req.getAccount());
-			if (body.getType() == 2 && cust != null ) {
-				throw new CustomException("此帳號已存在，無法新增");
-			} else if (body.getType() == 3 && cust == null){
+			if ("ADD".equals(type.getTypeName()) && cust != null) {
+				throw new CustomException("此帳號已存在，無法新s增");
+			} else if ("UPDATE".equals(type.getTypeName()) && cust == null) {
 				throw new CustomException("此帳號不存在，無法更新");
 			} else {
-				Customer c = Customer.builder().account(req.getAccount()).address(body.address)
-						.email(body.getEmail()).name(body.getName())
-						.password(body.getPassword()).phone(body.getPhone())
-						.status(body.getStatus()).payment(body.getPayment()).build();
-				Customer updCustomer = custDao.save(c);
+				Customer newCust = Customer.builder()
+						.account(req.getAccount())
+						.address(body.address)
+						.email(body.getEmail())
+						.name(body.getName())
+						.password(body.getPassword())
+						.phone(body.getPhone())
+						.status(body.getStatus())
+						.payment(body.getPayment()).build();
+				Customer updCustomer = custDao.save(newCust);
 				if (updCustomer != null) {
 					custList.add(updCustomer);
 				} else {
 					return OUT.builder().custList(custList).code(HttpStatus.BAD_REQUEST.value()).msg("新增失敗").build();
 				}
 			}
-		}
-		if (body.getType() == 4 ) {
+			break;
+		case DELETE:
 			custDao.deleteByAccount(req.getAccount());
+			break;
 		}
 		log.info("custList:{}", custList);
 		return OUT.builder().custList(custList).code(HttpStatus.OK.value()).msg("execute success.").build();

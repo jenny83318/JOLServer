@@ -1,8 +1,10 @@
-package com.Jenny.JOLServer.model;
+package com.Jenny.JOLServer.common;
 
 public enum Fun {
 	LOGIN("LogIn"),
-	CUSTOMER("JOLCustomerInfo"); 
+	CUSTOMER("JOLCustomerInfo"),
+	PRODUCT("JOLProductInfo"),
+	CART("JOLCartInfo");
 
 	private final String funName;
 
@@ -11,7 +13,7 @@ public enum Fun {
 	}
 
 	public String getFunName() {
-		return funName;
+		return this.funName;
 	}
 	public static Fun getFunValue(String value) {
         for (Fun f : Fun.values()) {

@@ -20,8 +20,8 @@ CREATE TABLE `jol_customer` (
 CREATE TABLE `jol_product` (
 	`prodId` int(11) NOT NULL AUTO_INCREMENT,
 	`name` char(50) NOT NULL,
-	`descript` char(100),
-	`img` blob NOT NULL,
+	`descript` char(max),
+	`imgURL` char(150) NOT NULL,
 	`createDt` DATETIME NOT NULL,
 	`updateDt` DATETIME NOT NULL,
 	`price` int NOT NULL,
@@ -35,11 +35,21 @@ CREATE TABLE `jol_product` (
 CREATE TABLE `jol_order` (
 	`orderNo` int NOT NULL AUTO_INCREMENT UNIQUE,
 	`account` char(45) NOT NULL UNIQUE,
+	`totalAmt` int NOT NULL,
+	`orderTime` DATETIME NOT NULL,
+	`shipNo` char(20) NOT NULL,
+	`status` char(20) NOT NULL,
+	`updateDt` DATETIME NOT NULL,
+	PRIMARY KEY (`orderNo`)
+);
+
+CREATE TABLE `jol_order_detail` (
+	`orderDetailNo` int NOT NULL AUTO_INCREMENT UNIQUE,
+	`orderNo` int NOT NULL,
+	`account` char(45) NOT NULL UNIQUE,
 	`prodId` int NOT NULL,
 	`qty` int NOT NULL,
 	`price` int NOT NULL,
-	`orderTime` DATETIME NOT NULL,
-	`shipNo` char(20) NOT NULL,
 	`status` char(20) NOT NULL,
 	`updateDt` DATETIME NOT NULL,
 	PRIMARY KEY (`orderNo`)
@@ -52,6 +62,7 @@ CREATE TABLE `jol_cart` (
 	`qty` int NOT NULL,
 	`size` char(10) NOT NULL,
 	`updateDt` DATETIME NOT NULL,
+	`isCart` BOOLEAN NOT NULL,
 	PRIMARY KEY (`cartId`)
 );
 
