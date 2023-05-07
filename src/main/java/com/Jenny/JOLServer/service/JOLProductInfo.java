@@ -137,7 +137,7 @@ public class JOLProductInfo {
 			}
 			break;
 		case SELECT:
-			Product p = productDao.findByProductId(body.getProdId());
+			Product p = productDao.findByProdId(body.getProdId());
 			if(p != null) {
 				prodList.add(ProdcutToProd(p));
 			}
@@ -164,6 +164,7 @@ public class JOLProductInfo {
 		List<byte[]> byteArrayList = new ArrayList<byte[]>();
 		List<String> urlList = Arrays.asList(url.split(","));
 		for(String urlStr : urlList) {
+			log.info("url:{}",urlStr);
 			InputStream inputStream = null;
 			byte[] imgBytes = null;
 			try {
@@ -188,7 +189,7 @@ public class JOLProductInfo {
 				.byteArrayList(getImg(p.getImgUrl()))
 				.category(p.getCategory())
 				.createDt(p.getCreateDt()) 
-				.description(p.getDescription())
+				.description(p.getDescript())
 				.name(p.getName())
 				.size(p.getSize())
 				.updateDt(p.getUpdateDt()).build();
@@ -199,7 +200,7 @@ public class JOLProductInfo {
 				.category(body.getCategory())
 				.cost(body.getCost())
 				.createDt(body.getCreateDt())
-				.description(body.getDescription())
+				.descript(body.getDescription())
 				.imgUrl(body.getImgUrl())
 				.name(body.getName())
 				.price(body.getPrice())

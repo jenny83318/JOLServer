@@ -22,7 +22,7 @@ public class Product {
 	@GeneratedValue (strategy = GenerationType.IDENTITY)
 	private Integer prodId;
 	private String name;
-	private String description;
+	private String descript;
 	private String imgUrl;
 	private String updateDt;
 	private String createDt;

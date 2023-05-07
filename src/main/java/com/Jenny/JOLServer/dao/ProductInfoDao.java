@@ -7,6 +7,6 @@ import com.Jenny.JOLServer.model.Product;
 
 @Repository
 public interface ProductInfoDao extends JpaRepository<Product, Integer> {
-	Product findByProductId(int id);
+	Product findByProdId(int id);
 
 }

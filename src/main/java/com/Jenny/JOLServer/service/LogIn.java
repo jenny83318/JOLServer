@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.Jenny.JOLServer.dao.CustomerInfoDao;
 import com.Jenny.JOLServer.model.Customer;
 import com.Jenny.JOLServer.model.Request;
+import com.Jenny.JOLServer.tool.CustomException;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,6 +50,17 @@ public class LogIn {
 		ModelMapper modelMapper = new ModelMapper();
 		BODY body = modelMapper.map(map, BODY.class);
 		return body;
+	}
+	
+	protected Request check(Request req) throws Exception {
+		if (req.getBody().get("password") == null) {
+			throw new CustomException("PARAM NOT FOUND: password");
+		}
+		if (req.getBody().get("token") == null) {
+			throw new CustomException("PARAM NOT FOUND: token");
+		}
+		
+		return req;
 	}
 
 	public OUT doProcess(Request req) throws Exception {

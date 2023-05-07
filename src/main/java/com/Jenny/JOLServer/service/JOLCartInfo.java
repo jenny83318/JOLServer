@@ -57,7 +57,10 @@ public class JOLCartInfo {
 		if (req.getBody().get("type") == null) {
 			throw new CustomException("PARAM NOT FOUND: type");
 		}
-		if (!"ALL".equals(req.getBody().get("type"))) {
+		if (req.getBody().get("isCart") == null) {
+			throw new CustomException("PARAM NOT FOUND: isCart");
+		}
+		if (!"SELECT".equals(req.getBody().get("type"))) {
 			if (req.getBody().get("cartId") == null) {
 				throw new CustomException("PARAM NOT FOUND: cartId");
 			}
@@ -74,9 +77,6 @@ public class JOLCartInfo {
 			}
 			if (req.getBody().get("updateDt") == null) {
 				throw new CustomException("PARAM NOT FOUND: updateDt");
-			}
-			if (req.getBody().get("isCart") == null) {
-				throw new CustomException("PARAM NOT FOUND: isCart");
 			}
 		}
 		return req;
