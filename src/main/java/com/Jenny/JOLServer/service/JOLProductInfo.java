@@ -25,7 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import java.util.Base64;
 
 @Service
 public class JOLProductInfo {
@@ -66,7 +66,7 @@ public class JOLProductInfo {
 		private Integer prodId;
 		private String name;
 		private String description;
-		private List<byte[]> byteArrayList;
+		private List<String> byteArrayList;
 		private String updateDt;
 		private String createDt;
 		private Integer price;
@@ -160,8 +160,8 @@ public class JOLProductInfo {
 	}
 	
 	
-	public List<byte[]> getImg(String url) throws IOException{
-		List<byte[]> byteArrayList = new ArrayList<byte[]>();
+	public List<String> getImg(String url) throws IOException{
+		List<String> byteArrayList = new ArrayList<String>();
 		List<String> urlList = Arrays.asList(url.split(","));
 		for(String urlStr : urlList) {
 			log.info("url:{}",urlStr);
@@ -170,7 +170,7 @@ public class JOLProductInfo {
 			try {
 				inputStream = getClass().getResourceAsStream(urlStr);
 				imgBytes = IOUtils.toByteArray(inputStream);
-				byteArrayList.add(imgBytes);
+				byteArrayList.add(Base64.getEncoder().encodeToString(imgBytes));
 			} catch (IOException e) {
 				throw new IOException("GET IMG ERROR:{}" + e.getMessage());
 			}finally {
