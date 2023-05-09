@@ -66,7 +66,7 @@ public class JOLProductInfo {
 		private Integer prodId;
 		private String name;
 		private String description;
-		private List<String> byteArrayList;
+		private List<String> imgList;
 		private String updateDt;
 		private String createDt;
 		private Integer price;
@@ -186,7 +186,7 @@ public class JOLProductInfo {
 				.cost(p.getCost())
 				.price(p.getPrice())
 				.qty(p.getQty())
-				.byteArrayList(getImg(p.getImgUrl()))
+				.imgList(getImg(p.getImgUrl()))
 				.category(p.getCategory())
 				.createDt(p.getCreateDt()) 
 				.description(p.getDescript())
