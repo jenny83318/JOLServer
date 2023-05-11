@@ -15,12 +15,12 @@ CREATE TABLE `jol_customer` (
   UNIQUE KEY `account` (`account`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `token_UNIQUE` (`token`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ;
 
 CREATE TABLE `jol_product` (
 	`prodId` int(11) NOT NULL AUTO_INCREMENT,
 	`name` char(50) NOT NULL,
-	`descript` char(max),
+	`descript` char(255),
 	`imgURL` char(150) NOT NULL,
 	`createDt` DATETIME NOT NULL,
 	`updateDt` DATETIME NOT NULL,
@@ -96,7 +96,7 @@ CREATE TABLE `jol_employee` (
 
 ALTER TABLE `jol_order` ADD CONSTRAINT `jol_order_fk0` FOREIGN KEY (`account`) REFERENCES `jol_customer`(`account`);
 
-ALTER TABLE `jol_order` ADD CONSTRAINT `jol_order_fk1` FOREIGN KEY (`prodId`) REFERENCES `jol_product`(`prodId`);
+ALTER TABLE `jol_order_detail` ADD CONSTRAINT `jol_order_fk1` FOREIGN KEY (`prodId`) REFERENCES `jol_product`(`prodId`);
 
 ALTER TABLE `jol_cart` ADD CONSTRAINT `jol_cart_fk0` FOREIGN KEY (`prodId`) REFERENCES `jol_product`(`prodId`);
 
