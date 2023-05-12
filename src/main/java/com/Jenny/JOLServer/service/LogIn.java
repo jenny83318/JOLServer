@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import lombok.NoArgsConstructor;
 
 @Service
 public class LogIn {
+	private static final Logger log = LoggerFactory.getLogger(LogIn.class);
 	@Autowired
 	private CustomerInfoDao custDao;
 
@@ -33,6 +36,7 @@ public class LogIn {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class BODY {
+		private String type;
 		private String password;
 		private String token;
 	}
@@ -53,6 +57,9 @@ public class LogIn {
 	}
 	
 	protected Request check(Request req) throws Exception {
+		if (req.getBody().get("type") == null) {
+			throw new CustomException("PARAM NOT FOUND: type");
+		}
 		if (req.getBody().get("password") == null) {
 			throw new CustomException("PARAM NOT FOUND: password");
 		}
@@ -79,17 +86,24 @@ public class LogIn {
 				Customer updCust = custDao.save(c);
 				out = OUT.builder().code(HttpStatus.OK.value()).msg("Success").token(updCust.getToken()).tokenExpired(updCust.getTokenExpired()).build();
 			} else {
-				if (c.getToken().equals(body.getToken())) {
+				 if ("CLEAN".equals(req.getBody().get("type")) ){
+						c.setTokenExpired(null);
+						c.setToken(null);
+						Customer updCust = custDao.save(c);
+						log.info("CLEAN:{}", updCust);
+						out = OUT.builder().code(HttpStatus.OK.value()).msg("Success").token(updCust.getToken()).tokenExpired(updCust.getTokenExpired()).build();
+					}
+				 else if (c.getToken().equals(body.getToken())) {
 			        LocalDateTime expired = LocalDateTime.parse(c.getTokenExpired(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 					int code = LocalDateTime.now().isAfter(expired) ? 777 : HttpStatus.OK.value();
 					String msg = code == 777 ? "token is expired" : "Success";
 					out = OUT.builder().code(code).msg(msg).token(c.getToken()).tokenExpired(c.getTokenExpired()).build();
 				} else {
-					out = OUT.builder().code(999).msg("Fail").token(c.getToken()).tokenExpired(c.getTokenExpired()).build();
+					out = OUT.builder().code(999).msg("Fail").token(null).tokenExpired(null).build();					
 				}
 			}
 		} else {
-			out = OUT.builder().code(555).msg("Account or Password Error").token(null).tokenExpired(null).build();
+			out = OUT.builder().code(555).msg("帳號或密碼錯誤請重新輸入").token(null).tokenExpired(null).build();
 		}
 		return out;
 	}
