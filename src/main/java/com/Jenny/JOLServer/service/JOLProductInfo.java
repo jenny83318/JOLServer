@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -25,14 +26,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.Base64;
 
 @Service
 public class JOLProductInfo {
 	private static final Logger log = LoggerFactory.getLogger(JOLProductInfo.class);
 	@Autowired
 	private ProductInfoDao productDao;
-	
 	@Data
 	@Builder
 	@NoArgsConstructor
@@ -57,23 +56,7 @@ public class JOLProductInfo {
 	public static class OUT {
 		private Integer code;
 		private String msg;
-		private List<Prod> productList;
-	}
-	
-	@Data
-	@Builder
-	public static class Prod {
-		private Integer prodId;
-		private String name;
-		private String description;
-		private List<String> imgList;
-		private String updateDt;
-		private String createDt;
-		private Integer price;
-		private Integer cost;
-		private Integer qty;
-		private String category;
-		private String size;
+		private List<Product> productList;
 	}
 	
 	protected Request check(Request req) throws Exception {
@@ -127,27 +110,19 @@ public class JOLProductInfo {
 		check(req);
 		BODY body = parser(req.getBody());
 		List<Product> productList = new ArrayList<Product>();
-		List<Prod> prodList = new ArrayList<Prod>();
 		Type type = Type.getType(body.getType());
 		switch(type) {
 		case ALL:
 			productList = productDao.findAll();
-			for(Product p : productList ) {
-				prodList.add(ProdcutToProd(p));
-			}
 			break;
 		case SELECT:
 			Product p = productDao.findByProdId(body.getProdId());
-			if(p != null) {
-				prodList.add(ProdcutToProd(p));
-			}
+			productList.add(p);
 			break;
 		case ADD:
 		case UPDATE:
-			Product prod = productDao.save(BodyToProduct(body));
-			if(prod != null) {
-				prodList.add(ProdcutToProd(prod));
-			}
+			Product updsteProd = productDao.save(BodyToProduct(body));
+			productList.add(updsteProd);
 			break;
 		case DELETE:
 			productDao.deleteById(body.getProdId());
@@ -155,8 +130,8 @@ public class JOLProductInfo {
 		default:
 			break;
 		}
-		log.info("prodList:{}", prodList);
-		return OUT.builder().productList(prodList).code(HttpStatus.OK.value()).msg("execute success.").build();
+		log.info("productList:{}", productList);
+		return OUT.builder().productList(productList).code(HttpStatus.OK.value()).msg("execute success.").build();
 	}
 	
 	
@@ -178,21 +153,6 @@ public class JOLProductInfo {
 			}
 		}
 		return byteArrayList;
-	}
-	
-	public Prod ProdcutToProd(Product p) throws IOException {
-		return Prod.builder()
-				.prodId(p.getProdId())
-				.cost(p.getCost())
-				.price(p.getPrice())
-				.qty(p.getQty())
-				.imgList(getImg(p.getImgUrl()))
-				.category(p.getCategory())
-				.createDt(p.getCreateDt()) 
-				.description(p.getDescript())
-				.name(p.getName())
-				.size(p.getSize())
-				.updateDt(p.getUpdateDt()).build();
 	}
 	
 	public Product BodyToProduct(BODY body) {
