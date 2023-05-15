@@ -56,7 +56,6 @@ public class JOLCustomerInfo {
 		private String email;
 		private String address;
 		private Integer status;
-		private String payment;
 	}
 
 	@Data
@@ -134,8 +133,7 @@ public class JOLCustomerInfo {
 						.name(body.getName())
 						.password(body.getPassword())
 						.phone(body.getPhone())
-						.status(body.getStatus())
-						.payment(body.getPayment()).build();
+						.status(body.getStatus()).build();
 				Customer updCustomer = custDao.save(newCust);
 				if (updCustomer != null) {
 					custList.add(updCustomer);

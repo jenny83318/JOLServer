@@ -25,7 +25,6 @@ public class Customer {
 	private String email;
 	private String address;
 	private Integer status;
-	private String payment;
 	private String token;
 	@Column(name = "token_expired")
 	private String tokenExpired;
