@@ -1,14 +1,9 @@
 package com.Jenny.JOLServer.service;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,30 +125,30 @@ public class JOLProductInfo {
 		default:
 			break;
 		}
-		log.info("productList:{}", productList);
+
 		return OUT.builder().productList(productList).code(HttpStatus.OK.value()).msg("execute success.").build();
 	}
 	
-	
-	public List<String> getImg(String url) throws IOException{
-		List<String> byteArrayList = new ArrayList<String>();
-		List<String> urlList = Arrays.asList(url.split(","));
-		for(String urlStr : urlList) {
-			log.info("url:{}",urlStr);
-			InputStream inputStream = null;
-			byte[] imgBytes = null;
-			try {
-				inputStream = getClass().getResourceAsStream(urlStr);
-				imgBytes = IOUtils.toByteArray(inputStream);
-				byteArrayList.add(Base64.getEncoder().encodeToString(imgBytes));
-			} catch (IOException e) {
-				throw new IOException("GET IMG ERROR:{}" + e.getMessage());
-			}finally {
-				inputStream.close();
-			}
-		}
-		return byteArrayList;
-	}
+//	圖片改直接從雲端取
+//	public List<String> getImg(String url) throws IOException{
+//		List<String> byteArrayList = new ArrayList<String>();
+//		List<String> urlList = Arrays.asList(url.split(","));
+//		for(String urlStr : urlList) {
+//			log.info("url:{}",urlStr);
+//			InputStream inputStream = null;
+//			byte[] imgBytes = null;
+//			try {
+//				inputStream = getClass().getResourceAsStream(urlStr);
+//				imgBytes = IOUtils.toByteArray(inputStream);
+//				byteArrayList.add(Base64.getEncoder().encodeToString(imgBytes));
+//			} catch (IOException e) {
+//				throw new IOException("GET IMG ERROR:{}" + e.getMessage());
+//			}finally {
+//				inputStream.close();
+//			}
+//		}
+//		return byteArrayList;
+//	}
 	
 	public Product BodyToProduct(BODY body) {
 		return Product.builder()
