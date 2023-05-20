@@ -1,5 +1,7 @@
 package com.Jenny.JOLServer.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import com.Jenny.JOLServer.common.Type;
 import com.Jenny.JOLServer.dao.CartInfoDao;
+import com.Jenny.JOLServer.dao.ProductInfoDao;
 import com.Jenny.JOLServer.model.Cart;
+import com.Jenny.JOLServer.model.Product;
 import com.Jenny.JOLServer.model.Request;
 import com.Jenny.JOLServer.tool.CustomException;
 
@@ -28,6 +32,9 @@ public class JOLCartInfo {
 	@Autowired
 	private CartInfoDao cartDao;
 
+	@Autowired
+	private ProductInfoDao productDao;
+
 	@Data
 	@Builder
 	@NoArgsConstructor
@@ -38,7 +45,6 @@ public class JOLCartInfo {
 		private int qty;
 		private String type;
 		private String size;
-		private String updateDt;
 		private boolean isCart;
 	}
 
@@ -47,10 +53,27 @@ public class JOLCartInfo {
 	public static class OUT {
 		private Integer code;
 		private String msg;
-		private List<Cart> cartList;
+		private List<CartItem> cartList;
+	}
+	
+
+	@Data
+	@Builder
+	public static class CartItem {
+		private Integer cartId;
+		private Integer prodId;
+		private String account;
+		private Integer qty;
+		private Integer price;
+		private String name;
+		private String imgUrl;
+		private String size;
+		private String updateDt;
+		private boolean isCart;
 	}
 
 	protected Request check(Request req) throws Exception {
+		log.info("req.getBody().get(prodId):{}",req.getBody().get("prodId"));
 		if (req.getAccount().isEmpty()) {
 			throw new CustomException("PARAM NOT FOUND: account");
 		}
@@ -60,7 +83,7 @@ public class JOLCartInfo {
 		if (req.getBody().get("isCart") == null) {
 			throw new CustomException("PARAM NOT FOUND: isCart");
 		}
-		if (!"SELECT".equals(req.getBody().get("type"))) {
+		if (!"SELECT".equals(req.getBody().get("type")) && ! "ADD".equals(req.getBody().get("type"))) {
 			if (req.getBody().get("cartId") == null) {
 				throw new CustomException("PARAM NOT FOUND: cartId");
 			}
@@ -75,9 +98,6 @@ public class JOLCartInfo {
 			if (req.getBody().get("size") == null) {
 				throw new CustomException("PARAM NOT FOUND: size");
 			}
-			if (req.getBody().get("updateDt") == null) {
-				throw new CustomException("PARAM NOT FOUND: updateDt");
-			}
 		}
 		return req;
 	}
@@ -91,15 +111,24 @@ public class JOLCartInfo {
 	public OUT doProcess(Request req) throws Exception {
 		check(req);
 		BODY body = parser(req.getBody());
-		List<Cart> cartList = new ArrayList<Cart>();
+//		List<Cart> cartList = new ArrayList<Cart>();
+		List<CartItem> cartList = new ArrayList<CartItem>();
 		Type type = Type.getType(body.getType());
 		switch (type) {
 		case SELECT:
-			cartList = this.cartDao.findByAccountAndIsCart(req.getAccount(), body.isCart);
+			cartList = getCartDataByAccount(req.getAccount(), body.isCart);
 			break;
 		case ADD:
 		case UPDATE:
-			Cart newCart = this.cartDao.save(
+			LocalDateTime currentTime = LocalDateTime.now();
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+	        String now = currentTime.format(formatter);
+	        List<Cart> cartProdList = cartDao.findByAccountAndIsCartAndProdIdAndSize(req.getAccount(), body.isCart, body.getProdId(),body.getSize());
+	        if(cartProdList.size() > 0) {
+	        	body.setQty(cartProdList.get(0).getQty() + body.getQty());
+	        	body.setCartId(cartProdList.get(0).getCartId());
+	        }
+			Cart newCart = cartDao.save(
 					Cart.builder()
 					.account(req.getAccount())
 					.cartId(body.getCartId())
@@ -107,9 +136,9 @@ public class JOLCartInfo {
 					.prodId(body.getProdId())
 					.qty(body.getQty())
 					.size(body.getSize())
-					.updateDt(body.getUpdateDt()).build());
+					.updateDt(now).build());
 			if (newCart != null) {
-				cartList = this.cartDao.findByAccountAndIsCart(req.getAccount(), body.isCart);
+				cartList =  getCartDataByAccount(req.getAccount(), body.isCart);
 			} else {
 				return OUT.builder().code(999).msg("新增或更新失敗").build();
 			}
@@ -122,5 +151,19 @@ public class JOLCartInfo {
 		}
 		log.info("cartList:{}", cartList);
 		return OUT.builder().cartList(cartList).code(HttpStatus.OK.value()).msg("execute success.").build();
+	}
+	
+	public List<CartItem> getCartDataByAccount(String account, boolean isCart) {
+		List<CartItem> cartItemList = new ArrayList<>();
+		List<Cart> cartList = new ArrayList<>();
+		cartList = cartDao.findByAccountAndIsCart(account, isCart);
+		for(Cart c : cartList) {
+			Product p = productDao.findByProdId(c.getProdId());
+			cartItemList.add(CartItem.builder().cartId(c.getCartId()).prodId(c.getProdId()).qty(c.getQty())
+					.account(c.getAccount()).size(c.getSize()).isCart(c.isCart()).updateDt(c.getUpdateDt())
+					.price(p.getPrice()).imgUrl(p.getImgUrl()).name(p.getName()).build());
+		}
+		return cartItemList;
+		
 	}
 }
