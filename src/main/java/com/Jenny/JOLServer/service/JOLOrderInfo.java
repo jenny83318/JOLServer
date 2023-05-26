@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.Jenny.JOLServer.common.Type;
 import com.Jenny.JOLServer.dao.OrderDetailDao;
 import com.Jenny.JOLServer.dao.OrderInfoDao;
+import com.Jenny.JOLServer.dao.ProductInfoDao;
 import com.Jenny.JOLServer.model.Order;
 import com.Jenny.JOLServer.model.OrderDetail;
 import com.Jenny.JOLServer.model.Request;
@@ -48,6 +49,9 @@ public class JOLOrderInfo {
 
 	@Autowired
 	private OrderDetailDao orderDetailDao;
+	
+	@Autowired
+	private ProductInfoDao productDao;
 
 	@Data
 	@Builder
@@ -156,6 +160,9 @@ public class JOLOrderInfo {
 		if (orderList.size() > 0) {
 			for (Order order : orderList) {
 				orderDetail = orderDetailDao.findByOrderNo(order.getOrderNo());
+				for(OrderDetail o : orderDetail) {
+					o.setImgUrl(productDao.findByProdId(o.getProdId()).getImgUrl());
+				}
 				dataList.add(ORDER.builder()
 				.orderNo(order.getOrderNo()).totalAmt(order
 			    .getTotalAmt()).orderTime(order.getOrderTime())

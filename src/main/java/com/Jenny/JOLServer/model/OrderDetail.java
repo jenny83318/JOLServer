@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,4 +29,6 @@ public class OrderDetail {
 	private int price;
 	private String status;
 	private String updateDt;
+	@Transient
+	private String imgUrl;
 }
