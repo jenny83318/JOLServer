@@ -25,8 +25,10 @@ import lombok.NoArgsConstructor;
 @Service
 public class JOLProductInfo {
 	private static final Logger log = LoggerFactory.getLogger(JOLProductInfo.class);
+	
 	@Autowired
 	private ProductInfoDao productDao;
+	
 	@Data
 	@Builder
 	@NoArgsConstructor

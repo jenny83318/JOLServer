@@ -4,7 +4,9 @@ public enum Fun {
 	LOGIN("LogIn"),
 	CUSTOMER("JOLCustomerInfo"),
 	PRODUCT("JOLProductInfo"),
-	CART("JOLCartInfo");
+	CART("JOLCartInfo"),
+	ORDER("JOLOrderInfo"),
+	ORDERDETAIL("JOLOrderDetailInfo");
 
 	private final String funName;
 

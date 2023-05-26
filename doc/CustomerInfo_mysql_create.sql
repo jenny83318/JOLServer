@@ -34,7 +34,7 @@ CREATE TABLE `jol_product` (
 
 CREATE TABLE `jol_order` (
 	`orderNo` int NOT NULL AUTO_INCREMENT UNIQUE,
-	`account` char(45) NOT NULL UNIQUE,
+	`account` char(45) NOT NULL,
 	`totalAmt` int NOT NULL,
 	`orderTime` DATETIME NOT NULL,
 	`shipNo` char(20) NOT NULL,
@@ -46,13 +46,13 @@ CREATE TABLE `jol_order` (
 CREATE TABLE `jol_order_detail` (
 	`orderDetailNo` int NOT NULL AUTO_INCREMENT UNIQUE,
 	`orderNo` int NOT NULL,
-	`account` char(45) NOT NULL UNIQUE,
+	`account` char(45) NOT NULL,
 	`prodId` int NOT NULL,
 	`qty` int NOT NULL,
 	`price` int NOT NULL,
 	`status` char(20) NOT NULL,
 	`updateDt` DATETIME NOT NULL,
-	PRIMARY KEY (`orderNo`)
+	PRIMARY KEY (`orderDetailNo`)
 );
 
 CREATE TABLE `jol_cart` (
