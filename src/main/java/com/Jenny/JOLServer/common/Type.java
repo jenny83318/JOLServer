@@ -5,7 +5,8 @@ public enum Type {
 	SELECT("SELECT"),
 	ADD("ADD"),
 	DELETE("DELETE"),
-	UPDATE("UPDATE");
+	UPDATE("UPDATE"),
+	OTHER("OTHER");
 	
 	private final String type;
 	

@@ -55,7 +55,6 @@ public class JOLCartInfo {
 		private String msg;
 		private List<CartItem> cartList;
 	}
-	
 
 	@Data
 	@Builder
@@ -73,7 +72,7 @@ public class JOLCartInfo {
 	}
 
 	protected Request check(Request req) throws Exception {
-		log.info("req.getBody().get(prodId):{}",req.getBody().get("prodId"));
+		log.info("req.getBody().get(prodId):{}", req.getBody().get("prodId"));
 		if (req.getAccount().isEmpty()) {
 			throw new CustomException("PARAM NOT FOUND: account");
 		}
@@ -83,7 +82,7 @@ public class JOLCartInfo {
 		if (!"ALL".equals(req.getBody().get("type")) && req.getBody().get("isCart") == null) {
 			throw new CustomException("PARAM NOT FOUND: isCart");
 		}
-		if (!"ALL".equals(req.getBody().get("type")) && !"SELECT".equals(req.getBody().get("type")) && ! "ADD".equals(req.getBody().get("type"))) {
+		if ("UPDATE".equals(req.getBody().get("type")) && "DELETE".equals(req.getBody().get("type"))) {
 			if (req.getBody().get("cartId") == null) {
 				throw new CustomException("PARAM NOT FOUND: cartId");
 			}
@@ -111,39 +110,46 @@ public class JOLCartInfo {
 	public OUT doProcess(Request req) throws Exception {
 		check(req);
 		BODY body = parser(req.getBody());
-//		List<Cart> cartList = new ArrayList<Cart>();
 		List<CartItem> cartList = new ArrayList<CartItem>();
 		Type type = Type.getType(body.getType());
 		switch (type) {
 		case ALL:
-			cartList = getCartDataByAccount(req.getAccount(), body.isCart, "ALL");
+			cartList = getCartDataByAccount(req.getAccount(), body.isCart, "ALL", body.getProdId());
 			break;
 		case SELECT:
-			cartList = getCartDataByAccount(req.getAccount(), body.isCart, "SELECT");
+			cartList = getCartDataByAccount(req.getAccount(), body.isCart(), "SELECT", body.getProdId());
+			break;
+		case OTHER:
+			cartList = getCartDataByAccount(req.getAccount(), body.isCart(), "OTHER", body.getProdId());
 			break;
 		case ADD:
 		case UPDATE:
 			LocalDateTime currentTime = LocalDateTime.now();
-	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-	        String now = currentTime.format(formatter);
-	        List<Cart> cartProdList = cartDao.findByAccountAndIsCartAndProdIdAndSize(req.getAccount(), body.isCart, body.getProdId(),body.getSize());
-	        if(cartProdList.size() > 0) {
-	        	body.setQty(cartProdList.get(0).getQty() + body.getQty());
-	        	body.setCartId(cartProdList.get(0).getCartId());
-	        }
-			Cart newCart = cartDao.save(
-					Cart.builder()
-					.account(req.getAccount())
-					.cartId(body.getCartId())
-					.isCart(body.isCart)
-					.prodId(body.getProdId())
-					.qty(body.getQty())
-					.size(body.getSize())
-					.updateDt(now).build());
-			if (newCart != null) {
-				cartList =  getCartDataByAccount(req.getAccount(), body.isCart,"SELECT");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			String now = currentTime.format(formatter);
+			List<Cart> cartProdList = new ArrayList<Cart>();
+			if (body.isCart()) {
+				cartProdList = cartDao.findByAccountAndIsCartAndProdIdAndSize(req.getAccount(), body.isCart, body.getProdId(), body.getSize());
 			} else {
-				return OUT.builder().code(999).msg("新增或更新失敗").build();
+				cartProdList = cartDao.findByAccountAndIsCartAndProdId(req.getAccount(), body.isCart, body.getProdId());
+			}
+
+			if (cartProdList.size() > 0 && body.isCart()) {
+				body.setQty(cartProdList.get(0).getQty() + body.getQty());
+				body.setCartId(cartProdList.get(0).getCartId());
+			}
+			if (cartProdList.size() > 0 && body.isCart() == false) {
+				cartList = getCartDataByAccount(req.getAccount(), body.isCart, "SELECT", body.getProdId());
+				return OUT.builder().cartList(cartList).code(333).msg("execute success.").build();
+			} else {
+				Cart newCart = cartDao.save(Cart.builder().account(req.getAccount()).cartId(body.getCartId())
+						.isCart(body.isCart()).prodId(body.getProdId()).qty(body.getQty()).size(body.getSize())
+						.updateDt(now).build());
+				if (newCart != null) {
+					cartList = getCartDataByAccount(req.getAccount(), body.isCart, "SELECT", body.getProdId());
+				} else {
+					return OUT.builder().code(999).msg("新增或更新失敗").build();
+				}
 			}
 			break;
 		case DELETE:
@@ -155,23 +161,26 @@ public class JOLCartInfo {
 		log.info("cartList:{}", cartList);
 		return OUT.builder().cartList(cartList).code(HttpStatus.OK.value()).msg("execute success.").build();
 	}
-	
-	public List<CartItem> getCartDataByAccount(String account, boolean isCart, String type) {
+
+	public List<CartItem> getCartDataByAccount(String account, boolean isCart, String type, int prodId) {
 		List<CartItem> cartItemList = new ArrayList<>();
 		List<Cart> cartList = new ArrayList<>();
-		if("SELECT".equals(type)) {
-		cartList = cartDao.findByAccountAndIsCart(account, isCart);
+		if ("SELECT".equals(type)) {
+			cartList = cartDao.findByAccountAndIsCart(account, isCart);
 		}
-		if("ALL".equals(type)) {
-		 cartList = cartDao.findByAccount(account);
+		if ("ALL".equals(type)) {
+			cartList = cartDao.findByAccount(account);
 		}
-		for(Cart c : cartList) {
-			Product p = productDao.findByProdId(c.getProdId());				
+		if("OTHER".equals(type)) {
+			cartList = cartDao.findByAccountAndIsCartAndProdId(account, isCart, prodId);
+		}
+		for (Cart c : cartList) {
+			Product p = productDao.findByProdId(c.getProdId());
 			cartItemList.add(CartItem.builder().cartId(c.getCartId()).prodId(c.getProdId()).qty(c.getQty())
-					.account(c.getAccount()).size(c.getSize()).isCart(c.isCart()).updateDt(c.getUpdateDt())
-					.price(p.getPrice()).imgUrl(p.getImgUrl()).name(p.getName()).build());
+					.account(c.getAccount()).size(c.isCart() ? c.getSize() : p.getSize()).isCart(c.isCart())
+					.updateDt(c.getUpdateDt()).price(p.getPrice()).imgUrl(p.getImgUrl()).name(p.getName()).build());
 		}
 		return cartItemList;
-		
+
 	}
 }
