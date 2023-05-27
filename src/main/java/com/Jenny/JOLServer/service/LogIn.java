@@ -86,6 +86,8 @@ public class LogIn {
 				Customer updCust = custDao.save(c);
 				out = OUT.builder().code(HttpStatus.OK.value()).msg("Success").token(updCust.getToken()).tokenExpired(updCust.getTokenExpired()).build();
 			} else {
+				log.info("c.getToken():{}",c.getToken());
+				log.info("body.getToken():{}",body.getToken());
 				 if ("CLEAN".equals(req.getBody().get("type")) ){
 						c.setTokenExpired(null);
 						c.setToken(null);

@@ -80,10 +80,10 @@ public class JOLCartInfo {
 		if (req.getBody().get("type") == null) {
 			throw new CustomException("PARAM NOT FOUND: type");
 		}
-		if (req.getBody().get("isCart") == null) {
+		if (!"ALL".equals(req.getBody().get("type")) && req.getBody().get("isCart") == null) {
 			throw new CustomException("PARAM NOT FOUND: isCart");
 		}
-		if (!"SELECT".equals(req.getBody().get("type")) && ! "ADD".equals(req.getBody().get("type"))) {
+		if (!"ALL".equals(req.getBody().get("type")) && !"SELECT".equals(req.getBody().get("type")) && ! "ADD".equals(req.getBody().get("type"))) {
 			if (req.getBody().get("cartId") == null) {
 				throw new CustomException("PARAM NOT FOUND: cartId");
 			}
@@ -115,8 +115,11 @@ public class JOLCartInfo {
 		List<CartItem> cartList = new ArrayList<CartItem>();
 		Type type = Type.getType(body.getType());
 		switch (type) {
+		case ALL:
+			cartList = getCartDataByAccount(req.getAccount(), body.isCart, "ALL");
+			break;
 		case SELECT:
-			cartList = getCartDataByAccount(req.getAccount(), body.isCart);
+			cartList = getCartDataByAccount(req.getAccount(), body.isCart, "SELECT");
 			break;
 		case ADD:
 		case UPDATE:
@@ -138,7 +141,7 @@ public class JOLCartInfo {
 					.size(body.getSize())
 					.updateDt(now).build());
 			if (newCart != null) {
-				cartList =  getCartDataByAccount(req.getAccount(), body.isCart);
+				cartList =  getCartDataByAccount(req.getAccount(), body.isCart,"SELECT");
 			} else {
 				return OUT.builder().code(999).msg("新增或更新失敗").build();
 			}
@@ -153,12 +156,17 @@ public class JOLCartInfo {
 		return OUT.builder().cartList(cartList).code(HttpStatus.OK.value()).msg("execute success.").build();
 	}
 	
-	public List<CartItem> getCartDataByAccount(String account, boolean isCart) {
+	public List<CartItem> getCartDataByAccount(String account, boolean isCart, String type) {
 		List<CartItem> cartItemList = new ArrayList<>();
 		List<Cart> cartList = new ArrayList<>();
+		if("SELECT".equals(type)) {
 		cartList = cartDao.findByAccountAndIsCart(account, isCart);
+		}
+		if("ALL".equals(type)) {
+		 cartList = cartDao.findByAccount(account);
+		}
 		for(Cart c : cartList) {
-			Product p = productDao.findByProdId(c.getProdId());
+			Product p = productDao.findByProdId(c.getProdId());				
 			cartItemList.add(CartItem.builder().cartId(c.getCartId()).prodId(c.getProdId()).qty(c.getQty())
 					.account(c.getAccount()).size(c.getSize()).isCart(c.isCart()).updateDt(c.getUpdateDt())
 					.price(p.getPrice()).imgUrl(p.getImgUrl()).name(p.getName()).build());
