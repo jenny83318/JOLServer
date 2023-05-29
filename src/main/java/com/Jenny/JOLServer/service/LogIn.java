@@ -36,7 +36,6 @@ public class LogIn {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class BODY {
-		private String type;
 		private String password;
 		private String token;
 	}
@@ -57,9 +56,6 @@ public class LogIn {
 	}
 	
 	protected Request check(Request req) throws Exception {
-		if (req.getBody().get("type") == null) {
-			throw new CustomException("PARAM NOT FOUND: type");
-		}
 		if (req.getBody().get("password") == null) {
 			throw new CustomException("PARAM NOT FOUND: password");
 		}
@@ -88,7 +84,7 @@ public class LogIn {
 			} else {
 				log.info("c.getToken():{}",c.getToken());
 				log.info("body.getToken():{}",body.getToken());
-				 if ("CLEAN".equals(req.getBody().get("type")) ){
+				 if ("CLEAN".equals(req.getType()) ){
 						c.setTokenExpired(null);
 						c.setToken(null);
 						Customer updCust = custDao.save(c);

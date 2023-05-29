@@ -58,7 +58,6 @@ public class JOLOrderInfo {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class BODY {
-		private String type;
 		private int orderNo;
 		private int totalAmt;
 		private String shipNo;
@@ -96,15 +95,12 @@ public class JOLOrderInfo {
 	}
 
 	protected Request check(Request req) throws Exception {
-		if (req.getBody().get("type") == null) {
-			throw new CustomException("PARAM NOT FOUND: type");
-		}
-		if ("UPDATE".equals(req.getBody().get("type"))) {
+		if ("UPDATE".equals(req.getType())) {
 			if (req.getBody().get("orderNo") == null) {
 				throw new CustomException("PARAM NOT FOUND: orderNo");
 			}
 		}
-		if ("ADD".equals(req.getBody().get("type")) || "UPDATE".equals(req.getBody().get("type"))) {
+		if ("ADD".equals(req.getType()) || "UPDATE".equals(req.getType())) {
 			if (req.getBody().get("totalAmt") == null) {
 				throw new CustomException("PARAM NOT FOUND: totalAmt");
 			}
@@ -128,7 +124,7 @@ public class JOLOrderInfo {
 		check(req);
 		BODY body = parser(req.getBody());
 		log.info("body:{}",body.toString());
-		Type type = Type.getType(body.getType());
+		Type type = Type.getType(req.getType());
 		List<ORDER> dataList = new ArrayList<ORDER>();
 		switch (type) {
 		case SELECT:

@@ -14,5 +14,6 @@ import lombok.NoArgsConstructor;
 public class Request {
 	private String fun;
 	private String account;
+	private String type;
 	private Map<String, Object> body;
 }

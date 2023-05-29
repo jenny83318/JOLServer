@@ -45,6 +45,9 @@ public class MainController {
 		if(req.getAccount().isEmpty()) {
 			throw new CustomException("PARAM NOT FOUND: accounts");
 		}
+		if(! "LogIn".equals(req.getFun()) && req.getType().isEmpty()) {
+			throw new CustomException("PARAM NOT FOUND: type");
+		}
 		Object out = new Object();
 		Fun fun = Fun.getFunValue(req.getFun());
 		switch (fun) {

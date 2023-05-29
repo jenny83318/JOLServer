@@ -1,5 +1,6 @@
 package com.Jenny.JOLServer.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,5 +31,5 @@ public class Product {
 	private Integer cost;
 	private Integer qty;
 	private String category;
-	private String size;
+	private String sizeInfo;
 }

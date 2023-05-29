@@ -34,7 +34,6 @@ public class JOLOrderDetailInfo {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class BODY {
-		private String type;
 		private int orderDetailNo;
 		private int orderNo;
 		private int prodId;
@@ -54,15 +53,12 @@ public class JOLOrderDetailInfo {
 	
 	
 	protected Request check(Request req) throws Exception {
-		if (req.getBody().get("type") == null) {
-			throw new CustomException("PARAM NOT FOUND: type");
-		}
-		if ("UPDATE".equals(req.getBody().get("type"))) {
+		if ("UPDATE".equals(req.getType())) {
 			if (req.getBody().get("orderDetailNo") == null) {
 				throw new CustomException("PARAM NOT FOUND: orderDetailNo");
 			}
 		}
-		if ("ADD".equals(req.getBody().get("type")) || "UPDATE".equals(req.getBody().get("type"))) {
+		if ("ADD".equals(req.getType()) || "UPDATE".equals(req.getType())) {
 			if (req.getBody().get("orderNo") == null) {
 				throw new CustomException("PARAM NOT FOUND: orderNo");
 			}
@@ -92,7 +88,7 @@ public class JOLOrderDetailInfo {
 		check(req);
 		BODY body = parser(req.getBody());
 		log.info("body:{}",body.toString());
-		Type type = Type.getType(body.getType());
+		Type type = Type.getType(req.getType());
 		switch (type) {
 		case ADD:
 		case UPDATE:

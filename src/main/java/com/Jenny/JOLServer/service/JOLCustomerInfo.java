@@ -24,10 +24,12 @@ import lombok.NoArgsConstructor;
 
 /*
  * Request JSON
+// 0:查全部、1:查單一、2:新增、3:編輯、4刪除
 {
     "account":"jenny83318",
-    "body":{
     "type":0,
+    "fun":"JOLCustomerInfo",
+    "body":{
     "account": "abc1235",
     "password": "vjsklemmr",
     "name": "林曉涵",
@@ -49,7 +51,6 @@ public class JOLCustomerInfo {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class BODY {
-		private String type;// 0:查全部、1:查單一、2:新增、3:編輯、4刪除
 		private String password;
 		private String name;
 		private String phone;
@@ -67,16 +68,7 @@ public class JOLCustomerInfo {
 	}
 
 	protected Request check(Request req) throws Exception {
-		if (req.getAccount().isEmpty()) {
-			throw new CustomException("PARAM NOT FOUND: account");
-		}
-		if (req.getFun().isEmpty()) {
-			throw new CustomException("PARAM NOT FOUND: fun");
-		}
-		if (req.getBody().get("type") == null) {
-			throw new CustomException("PARAM NOT FOUND: type");
-		}
-		if ("ADD".equals(req.getBody().get("type")) || "UPDATE".equals(req.getBody().get("type"))) {
+		if ("ADD".equals(req.getType()) || "UPDATE".equals(req.getType())) {
 			if (req.getBody().get("email") == null) {
 				throw new CustomException("PARAM NOT FOUND: email");
 			}
@@ -109,7 +101,7 @@ public class JOLCustomerInfo {
 		check(req);
 		BODY body = parser(req.getBody());
 		List<Customer> custList = new ArrayList<Customer>();
-		Type type = Type.getType(body.getType());
+		Type type = Type.getType(req.getType());
 		switch (type) {
 		case ALL:
 			custList = custDao.findAll();
@@ -144,6 +136,8 @@ public class JOLCustomerInfo {
 			break;
 		case DELETE:
 			custDao.deleteByAccount(req.getAccount());
+			break;
+		default:
 			break;
 		}
 		log.info("custList:{}", custList);

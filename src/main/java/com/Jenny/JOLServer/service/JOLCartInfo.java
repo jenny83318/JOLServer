@@ -43,7 +43,6 @@ public class JOLCartInfo {
 		private int cartId;
 		private int prodId;
 		private int qty;
-		private String type;
 		private String size;
 		private boolean isCart;
 	}
@@ -67,27 +66,21 @@ public class JOLCartInfo {
 		private String name;
 		private String imgUrl;
 		private String size;
+		private String sizeInfo;
 		private String updateDt;
 		private boolean isCart;
 	}
 
 	protected Request check(Request req) throws Exception {
-		log.info("req.getBody().get(prodId):{}", req.getBody().get("prodId"));
-		if (req.getAccount().isEmpty()) {
-			throw new CustomException("PARAM NOT FOUND: account");
-		}
-		if (req.getBody().get("type") == null) {
-			throw new CustomException("PARAM NOT FOUND: type");
-		}
-		if (!"ALL".equals(req.getBody().get("type")) && req.getBody().get("isCart") == null) {
+		if (!"ALL".equals(req.getType()) && req.getBody().get("isCart") == null) {
 			throw new CustomException("PARAM NOT FOUND: isCart");
 		}
-		if ("UPDATE".equals(req.getBody().get("type")) && "DELETE".equals(req.getBody().get("type"))) {
+		if ("UPDATE".equals(req.getType()) && "DELETE".equals(req.getType())) {
 			if (req.getBody().get("cartId") == null) {
 				throw new CustomException("PARAM NOT FOUND: cartId");
 			}
 		}
-		if ("ADD".equals(req.getBody().get("type")) || "UPDATE".equals(req.getBody().get("type"))) {
+		if ("ADD".equals(req.getType()) || "UPDATE".equals(req.getType())) {
 			if (req.getBody().get("prodId") == null) {
 				throw new CustomException("PARAM NOT FOUND: prodId");
 			}
@@ -111,7 +104,7 @@ public class JOLCartInfo {
 		check(req);
 		BODY body = parser(req.getBody());
 		List<CartItem> cartList = new ArrayList<CartItem>();
-		Type type = Type.getType(body.getType());
+		Type type = Type.getType(req.getType());
 		switch (type) {
 		case ALL:
 			cartList = getCartDataByAccount(req.getAccount(), body.isCart, "ALL", body.getProdId());
@@ -177,7 +170,7 @@ public class JOLCartInfo {
 		for (Cart c : cartList) {
 			Product p = productDao.findByProdId(c.getProdId());
 			cartItemList.add(CartItem.builder().cartId(c.getCartId()).prodId(c.getProdId()).qty(c.getQty())
-					.account(c.getAccount()).size(c.isCart() ? c.getSize() : p.getSize()).isCart(c.isCart())
+					.account(c.getAccount()).size(c.getSize()).sizeInfo(p.getSizeInfo()).isCart(c.isCart())
 					.updateDt(c.getUpdateDt()).price(p.getPrice()).imgUrl(p.getImgUrl()).name(p.getName()).build());
 		}
 		return cartItemList;

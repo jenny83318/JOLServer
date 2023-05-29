@@ -34,7 +34,6 @@ public class JOLProductInfo {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class BODY {
-		private String type;
 		private Integer prodId;
 		private String name;
 		private String description;
@@ -57,15 +56,12 @@ public class JOLProductInfo {
 	}
 	
 	protected Request check(Request req) throws Exception {
-		if (req.getBody().get("type") == null) {
-			throw new CustomException("PARAM NOT FOUND: type");
-		}
-		if (!"ALL".equals(req.getBody().get("type"))) {
+		if (!"ALL".equals(req.getType())) {
 			if (req.getBody().get("cartId") == null) {
 				throw new CustomException("PARAM NOT FOUND: prodId");
 			}
 		}
-		if ("ADD".equals(req.getBody().get("type")) || "UPDATE".equals(req.getBody().get("type"))) {
+		if ("ADD".equals(req.getType()) || "UPDATE".equals(req.getType())) {
 			if (req.getBody().get("name") == null) {
 				throw new CustomException("PARAM NOT FOUND: name");
 			}
@@ -107,7 +103,7 @@ public class JOLProductInfo {
 		check(req);
 		BODY body = parser(req.getBody());
 		List<Product> productList = new ArrayList<Product>();
-		Type type = Type.getType(body.getType());
+		Type type = Type.getType(req.getType());
 		switch(type) {
 		case ALL:
 			productList = productDao.findAll();
@@ -163,7 +159,7 @@ public class JOLProductInfo {
 				.price(body.getPrice())
 				.prodId(body.getProdId())
 				.qty(body.getQty())
-				.size(body.getSize())
+				.sizeInfo(body.getSize())
 				.updateDt(body.getUpdateDt()).build();
 	}
 }
