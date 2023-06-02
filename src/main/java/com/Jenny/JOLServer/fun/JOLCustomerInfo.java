@@ -1,4 +1,4 @@
-package com.Jenny.JOLServer.service;
+package com.Jenny.JOLServer.fun;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +55,8 @@ public class JOLCustomerInfo {
 		private String name;
 		private String phone;
 		private String email;
+		private String city;
+		private String district;
 		private String address;
 		private Integer status;
 	}
@@ -87,6 +89,12 @@ public class JOLCustomerInfo {
 			if (req.getBody().get("status") == null) {
 				throw new CustomException("PARAM NOT FOUND: status");
 			}
+			if (req.getBody().get("city") == null) {
+				throw new CustomException("PARAM NOT FOUND: city");
+			}
+			if (req.getBody().get("district") == null) {
+				throw new CustomException("PARAM NOT FOUND: district");
+			}
 		}
 		return req;
 	}
@@ -114,7 +122,7 @@ public class JOLCustomerInfo {
 		case UPDATE:
 			Customer cust = custDao.findByAccount(req.getAccount());
 			if ("ADD".equals(type.getTypeName()) && cust != null) {
-				throw new CustomException("此帳號已存在，無法新s增");
+				throw new CustomException("此帳號已存在，無法新增");
 			} else if ("UPDATE".equals(type.getTypeName()) && cust == null) {
 				throw new CustomException("此帳號不存在，無法更新");
 			} else {

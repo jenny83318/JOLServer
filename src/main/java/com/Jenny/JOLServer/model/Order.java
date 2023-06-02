@@ -22,10 +22,20 @@ public class Order {
 	@GeneratedValue (strategy = GenerationType.IDENTITY)
 	private int orderNo;
 	private String account;
+	private String email;
 	private int totalAmt;
 	private String orderTime;
-	private String shipNo;
 	private String status;
+	private String deliveryWay;
+	private String deliveryNo;
+	private String orderName;
+	private String orderPhone;
+	private String orderCity;
+	private String orderDistrict;
+	private String orderAddress;
+	private String sendName;
+	private String sendCity;
+	private String sendAddress;
+	private String vehicle;
 	private String updateDt;
-	
 }

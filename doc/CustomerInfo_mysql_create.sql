@@ -6,6 +6,8 @@ CREATE TABLE `jol_customer` (
   `email` char(100) NOT NULL,
   `phone` char(45) NOT NULL,
   `name` char(45) NOT NULL,
+  `city` char(20) NOT NULL,
+  `district` char(20) NOT NULL,
   `address` char(150) NOT NULL,
   `status` tinyint(1) NOT NULL,
   `payment` char(45) NOT NULL,
@@ -33,14 +35,28 @@ CREATE TABLE `jol_product` (
 );
 
 CREATE TABLE `jol_order` (
-	`orderNo` int NOT NULL AUTO_INCREMENT UNIQUE,
-	`account` char(45) NOT NULL,
-	`totalAmt` int NOT NULL,
-	`orderTime` DATETIME NOT NULL,
-	`shipNo` char(20) NOT NULL,
-	`status` char(20) NOT NULL,
-	`updateDt` DATETIME NOT NULL,
-	PRIMARY KEY (`orderNo`)
+  `orderNo` int(11) NOT NULL AUTO_INCREMENT,
+  `account` char(45) NOT NULL,
+  `email` char(50) DEFAULT NULL,
+  `totalAmt` int(11) NOT NULL,
+  `orderTime` datetime NOT NULL,
+  `status` char(20) NOT NULL,
+  `deliveryWay` char(20) NOT NULL,
+  `deliveryNo` char(20) NOT NULL,
+  `orderName` char(20) DEFAULT NULL,
+  `orderPhone` char(20) DEFAULT NULL,
+  `orderCity` char(10) DEFAULT NULL,
+  `orderDistrict` char(10) DEFAULT NULL,
+  `orderAddress` char(150) DEFAULT NULL,
+  `sendName` char(20) DEFAULT NULL,
+  `sendPhone` char(20) DEFAULT NULL,
+  `sendCity` char(10) DEFAULT NULL,
+  `sendDistrict` char(10) DEFAULT NULL,
+  `sendAddress` char(150) DEFAULT NULL,
+  `vehicle` char(20) DEFAULT NULL,  
+  `updateDt` datetime NOT NULL,
+  PRIMARY KEY (`orderNo`),
+  UNIQUE KEY `orderNo` (`orderNo`)
 );
 
 CREATE TABLE `jol_order_detail` (

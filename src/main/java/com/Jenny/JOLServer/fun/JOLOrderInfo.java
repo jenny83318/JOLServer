@@ -1,4 +1,4 @@
-package com.Jenny.JOLServer.service;
+package com.Jenny.JOLServer.fun;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -59,9 +59,22 @@ public class JOLOrderInfo {
 	@AllArgsConstructor
 	public static class BODY {
 		private int orderNo;
+		private String email;
 		private int totalAmt;
-		private String shipNo;
+		private String orderTime;
 		private String status;
+		private String deliveryWay;
+		private String deliveryNo;
+		private String orderName;
+		private String orderPhone;
+		private String orderCity;
+		private String orderDistrict;
+		private String orderAddress;
+		private String sendName;
+		private String sendCity;
+		private String sendAddress;
+		private String vehicle;
+		private String updateDt;
 	}
 
 	@Data
@@ -81,13 +94,37 @@ public class JOLOrderInfo {
 		@Builder.Default
 		private int orderNo = 0;
 		@Builder.Default
+		private String account = "";
+		@Builder.Default
+		private String email = "";
+		@Builder.Default
 		private int totalAmt = 0;
 		@Builder.Default
 		private String orderTime = "";
 		@Builder.Default
-		private String shipNo = "";
-		@Builder.Default
 		private String status = "";
+		@Builder.Default
+		private String deliveryWay = "";
+		@Builder.Default
+		private String deliveryNo = "";
+		@Builder.Default
+		private String orderName = "";
+		@Builder.Default
+		private String orderPhone = "";
+		@Builder.Default
+		private String orderCity = "";
+		@Builder.Default
+		private String orderDistrict = "";
+		@Builder.Default
+		private String orderAddress = "";
+		@Builder.Default
+		private String sendName = "";
+		@Builder.Default
+		private String sendCity = "";
+		@Builder.Default
+		private String sendAddress = "";
+		@Builder.Default
+		private String vehicle = "";
 		@Builder.Default
 		private String updateDt = "";
 		@Builder.Default
@@ -135,12 +172,25 @@ public class JOLOrderInfo {
 			LocalDateTime currentTime = LocalDateTime.now();
 	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	        String now = currentTime.format(formatter);
-			Order o = orderDao.save(Order.builder().account(req.getAccount())
-					.orderTime(now).shipNo(body.getShipNo())
-					.status(body.getStatus()).totalAmt(body.getTotalAmt()).updateDt(now).build());
-			dataList.add(ORDER.builder().orderNo(o.getOrderNo()).orderTime(o.getOrderTime())
-					.totalAmt(o.getTotalAmt()).shipNo(o.getShipNo()).status(o.getStatus())
-					.updateDt(o.getUpdateDt()).build());
+			Order o = orderDao.save(Order.builder()
+					.orderNo(body.getOrderNo()).account(req.getAccount())
+					.email(body.getEmail()).totalAmt(body.getTotalAmt())
+					.orderTime(now).status(body.getStatus())
+					.deliveryWay(body.getDeliveryWay()).deliveryNo(body.getDeliveryNo())
+					.orderName(body.getOrderName()).orderCity(body.getOrderCity())
+					.orderPhone(body.getOrderPhone()).orderDistrict(body.getOrderDistrict())
+					.orderAddress(body.getOrderAddress()).sendName(body.getSendName())
+					.sendCity(body.getSendCity()).sendAddress(body.getSendAddress())
+					.updateDt(now).vehicle(body.getVehicle()).build());
+			dataList.add(ORDER.builder().orderNo(o.getOrderNo()).account(o.getAccount())
+					.email(o.getEmail()).totalAmt(o.getTotalAmt())
+					.orderTime(o.getOrderTime()).status(o.getStatus())
+					.deliveryWay(o.getDeliveryWay()).deliveryNo(o.getDeliveryNo())
+					.orderName(o.getOrderName()).orderCity(o.getOrderCity())
+					.orderPhone(o.getOrderPhone()).orderDistrict(o.getOrderDistrict())
+					.orderAddress(o.getOrderAddress()).sendName(o.getSendName())
+					.sendCity(o.getSendCity()).sendAddress(o.getSendAddress())
+					.updateDt(o.getUpdateDt()).vehicle(o.getVehicle()).build());
 			break;
 		default:
 			break;
@@ -159,11 +209,15 @@ public class JOLOrderInfo {
 				for(OrderDetail o : orderDetail) {
 					o.setImgUrl(productDao.findByProdId(o.getProdId()).getImgUrl());
 				}
-				dataList.add(ORDER.builder()
-				.orderNo(order.getOrderNo()).totalAmt(order
-			    .getTotalAmt()).orderTime(order.getOrderTime())
-				.shipNo(order.getShipNo()).status(order.getStatus())
-				.updateDt(order.getUpdateDt()).orderDetail(orderDetail).build());
+				dataList.add(ORDER.builder().orderNo(order.getOrderNo()).account(order.getAccount())
+						.email(order.getEmail()).totalAmt(order.getTotalAmt())
+						.orderTime(order.getOrderTime()).status(order.getStatus())
+						.deliveryWay(order.getDeliveryWay()).deliveryNo(order.getDeliveryNo())
+						.orderName(order.getOrderName()).orderCity(order.getOrderCity())
+						.orderPhone(order.getOrderPhone()).orderDistrict(order.getOrderDistrict())
+						.orderAddress(order.getOrderAddress()).sendName(order.getSendName())
+						.sendCity(order.getSendCity()).sendAddress(order.getSendAddress())
+						.updateDt(order.getUpdateDt()).vehicle(order.getVehicle()).build());
 			}
 		}
 		return dataList;

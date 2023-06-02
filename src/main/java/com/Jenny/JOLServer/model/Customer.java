@@ -23,6 +23,8 @@ public class Customer {
 	private String name;
 	private String phone;
 	private String email;
+	private String city;
+	private String district;
 	private String address;
 	private Integer status;
 	private String token;

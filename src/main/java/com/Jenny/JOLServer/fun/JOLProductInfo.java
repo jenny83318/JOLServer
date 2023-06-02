@@ -1,4 +1,4 @@
-package com.Jenny.JOLServer.service;
+package com.Jenny.JOLServer.fun;
 
 import java.util.ArrayList;
 import java.util.List;
