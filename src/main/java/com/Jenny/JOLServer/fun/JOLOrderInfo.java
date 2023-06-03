@@ -61,7 +61,6 @@ public class JOLOrderInfo {
 		private int orderNo;
 		private String email;
 		private int totalAmt;
-		private String orderTime;
 		private String status;
 		private String deliveryWay;
 		private String deliveryNo;
@@ -71,10 +70,12 @@ public class JOLOrderInfo {
 		private String orderDistrict;
 		private String orderAddress;
 		private String sendName;
+		private String sendPhone;
 		private String sendCity;
 		private String sendAddress;
 		private String vehicle;
-		private String updateDt;
+		private String vehicleType;
+		private String payBy;	
 	}
 
 	@Data
@@ -126,6 +127,10 @@ public class JOLOrderInfo {
 		@Builder.Default
 		private String vehicle = "";
 		@Builder.Default
+		private String vehicleType ="";
+		@Builder.Default
+		private String payBy="";	
+		@Builder.Default
 		private String updateDt = "";
 		@Builder.Default
 		private List<OrderDetail> orderDetail = new ArrayList<OrderDetail>();
@@ -141,9 +146,9 @@ public class JOLOrderInfo {
 			if (req.getBody().get("totalAmt") == null) {
 				throw new CustomException("PARAM NOT FOUND: totalAmt");
 			}
-			if (req.getBody().get("shipNo") == null) {
-				throw new CustomException("PARAM NOT FOUND: shipNo");
-			}
+//			if (req.getBody().get("shipNo") == null) {
+//				throw new CustomException("PARAM NOT FOUND: shipNo");
+//			}
 			if (req.getBody().get("status") == null) {
 				throw new CustomException("PARAM NOT FOUND: status");
 			}
@@ -181,7 +186,8 @@ public class JOLOrderInfo {
 					.orderPhone(body.getOrderPhone()).orderDistrict(body.getOrderDistrict())
 					.orderAddress(body.getOrderAddress()).sendName(body.getSendName())
 					.sendCity(body.getSendCity()).sendAddress(body.getSendAddress())
-					.updateDt(now).vehicle(body.getVehicle()).build());
+					.updateDt(now).vehicle(body.getVehicle()).sendPhone(body.getSendPhone())
+					.vehicleType(body.getVehicleType()).payBy(body.getPayBy()).build());
 			dataList.add(ORDER.builder().orderNo(o.getOrderNo()).account(o.getAccount())
 					.email(o.getEmail()).totalAmt(o.getTotalAmt())
 					.orderTime(o.getOrderTime()).status(o.getStatus())
@@ -190,7 +196,8 @@ public class JOLOrderInfo {
 					.orderPhone(o.getOrderPhone()).orderDistrict(o.getOrderDistrict())
 					.orderAddress(o.getOrderAddress()).sendName(o.getSendName())
 					.sendCity(o.getSendCity()).sendAddress(o.getSendAddress())
-					.updateDt(o.getUpdateDt()).vehicle(o.getVehicle()).build());
+					.updateDt(o.getUpdateDt()).vehicle(o.getVehicle())
+					.vehicleType(o.getVehicleType()).payBy(o.getPayBy()).build());
 			break;
 		default:
 			break;
@@ -217,7 +224,8 @@ public class JOLOrderInfo {
 						.orderPhone(order.getOrderPhone()).orderDistrict(order.getOrderDistrict())
 						.orderAddress(order.getOrderAddress()).sendName(order.getSendName())
 						.sendCity(order.getSendCity()).sendAddress(order.getSendAddress())
-						.updateDt(order.getUpdateDt()).vehicle(order.getVehicle()).build());
+						.updateDt(order.getUpdateDt()).vehicle(order.getVehicle())
+						.vehicleType(order.getVehicleType()).payBy(order.getPayBy()).build());
 			}
 		}
 		return dataList;

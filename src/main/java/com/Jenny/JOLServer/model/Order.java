@@ -34,8 +34,11 @@ public class Order {
 	private String orderDistrict;
 	private String orderAddress;
 	private String sendName;
+	private String sendPhone;
 	private String sendCity;
 	private String sendAddress;
+	private String vehicleType;
 	private String vehicle;
+	private String payBy;	
 	private String updateDt;
 }
