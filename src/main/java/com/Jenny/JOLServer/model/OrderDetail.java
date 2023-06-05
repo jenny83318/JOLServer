@@ -31,4 +31,6 @@ public class OrderDetail {
 	private String updateDt;
 	@Transient
 	private String imgUrl;
+	@Transient
+	private String prodName;
 }

@@ -19,6 +19,7 @@ import com.Jenny.JOLServer.dao.OrderInfoDao;
 import com.Jenny.JOLServer.dao.ProductInfoDao;
 import com.Jenny.JOLServer.model.Order;
 import com.Jenny.JOLServer.model.OrderDetail;
+import com.Jenny.JOLServer.model.Product;
 import com.Jenny.JOLServer.model.Request;
 import com.Jenny.JOLServer.tool.CustomException;
 
@@ -237,7 +238,9 @@ public class JOLOrderInfo {
 			for (Order order : orderList) {
 				orderDetail = orderDetailDao.findByOrderNo(order.getOrderNo());
 				for(OrderDetail o : orderDetail) {
-					o.setImgUrl(productDao.findByProdId(o.getProdId()).getImgUrl());
+					Product p = productDao.findByProdId(o.getProdId());
+					o.setImgUrl(p.getImgUrl());
+					o.setProdName(p.getName());
 				}
 				dataList.add(dbToBean(order, orderDetail));
 			}
