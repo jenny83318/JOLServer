@@ -72,6 +72,7 @@ public class JOLOrderInfo {
 		private String sendName;
 		private String sendPhone;
 		private String sendCity;
+		private String sendDistrict;
 		private String sendAddress;
 		private String vehicle;
 		private String vehicleType;
@@ -123,6 +124,8 @@ public class JOLOrderInfo {
 		@Builder.Default
 		private String sendCity = "";
 		@Builder.Default
+		private String sendDistrict = "";
+		@Builder.Default
 		private String sendAddress = "";
 		@Builder.Default
 		private String vehicle = "";
@@ -146,11 +149,53 @@ public class JOLOrderInfo {
 			if (req.getBody().get("totalAmt") == null) {
 				throw new CustomException("PARAM NOT FOUND: totalAmt");
 			}
-//			if (req.getBody().get("shipNo") == null) {
-//				throw new CustomException("PARAM NOT FOUND: shipNo");
-//			}
+			if (req.getBody().get("email") == null) {
+				throw new CustomException("PARAM NOT FOUND: email");
+			}
 			if (req.getBody().get("status") == null) {
 				throw new CustomException("PARAM NOT FOUND: status");
+			}
+			if (req.getBody().get("deliveryWay") == null) {
+				throw new CustomException("PARAM NOT FOUND: deliveryWay");
+			}
+			if (req.getBody().get("deliveryNo") == null) {
+				throw new CustomException("PARAM NOT FOUND: deliveryNo");
+			}
+			if (req.getBody().get("orderName") == null) {
+				throw new CustomException("PARAM NOT FOUND: orderName");
+			}
+			if (req.getBody().get("orderPhone") == null) {
+				throw new CustomException("PARAM NOT FOUND: orderPhone");
+			}
+			if (req.getBody().get("orderCity") == null) {
+				throw new CustomException("PARAM NOT FOUND: orderCity");
+			}
+			if (req.getBody().get("orderDistrict") == null) {
+				throw new CustomException("PARAM NOT FOUND: orderDistrict");
+			}
+			if (req.getBody().get("orderAddress") == null) {
+				throw new CustomException("PARAM NOT FOUND: orderAddress");
+			}
+			if (req.getBody().get("sendName") == null) {
+				throw new CustomException("PARAM NOT FOUND: sendName");
+			}
+			if (req.getBody().get("sendPhone") == null) {
+				throw new CustomException("PARAM NOT FOUND: sendPhone");
+			}
+			if (req.getBody().get("sendCity") == null) {
+				throw new CustomException("PARAM NOT FOUND: sendCity");
+			}
+			if (req.getBody().get("sendDistrict") == null) {
+				throw new CustomException("PARAM NOT FOUND: sendDistrict");
+			}
+			if (req.getBody().get("sendAddress") == null) {
+				throw new CustomException("PARAM NOT FOUND: sendAddress");
+			}
+			if (req.getBody().get("vehicleType") == null) {
+				throw new CustomException("PARAM NOT FOUND: vehicleType");
+			}
+			if (req.getBody().get("payBy") == null) {
+				throw new CustomException("PARAM NOT FOUND: payBy");
 			}
 		}
 		return req;
@@ -174,30 +219,8 @@ public class JOLOrderInfo {
 			break;
 		case ADD:
 		case UPDATE:
-			LocalDateTime currentTime = LocalDateTime.now();
-	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-	        String now = currentTime.format(formatter);
-			Order o = orderDao.save(Order.builder()
-					.orderNo(body.getOrderNo()).account(req.getAccount())
-					.email(body.getEmail()).totalAmt(body.getTotalAmt())
-					.orderTime(now).status(body.getStatus())
-					.deliveryWay(body.getDeliveryWay()).deliveryNo(body.getDeliveryNo())
-					.orderName(body.getOrderName()).orderCity(body.getOrderCity())
-					.orderPhone(body.getOrderPhone()).orderDistrict(body.getOrderDistrict())
-					.orderAddress(body.getOrderAddress()).sendName(body.getSendName())
-					.sendCity(body.getSendCity()).sendAddress(body.getSendAddress())
-					.updateDt(now).vehicle(body.getVehicle()).sendPhone(body.getSendPhone())
-					.vehicleType(body.getVehicleType()).payBy(body.getPayBy()).build());
-			dataList.add(ORDER.builder().orderNo(o.getOrderNo()).account(o.getAccount())
-					.email(o.getEmail()).totalAmt(o.getTotalAmt())
-					.orderTime(o.getOrderTime()).status(o.getStatus())
-					.deliveryWay(o.getDeliveryWay()).deliveryNo(o.getDeliveryNo())
-					.orderName(o.getOrderName()).orderCity(o.getOrderCity())
-					.orderPhone(o.getOrderPhone()).orderDistrict(o.getOrderDistrict())
-					.orderAddress(o.getOrderAddress()).sendName(o.getSendName())
-					.sendCity(o.getSendCity()).sendAddress(o.getSendAddress())
-					.updateDt(o.getUpdateDt()).vehicle(o.getVehicle())
-					.vehicleType(o.getVehicleType()).payBy(o.getPayBy()).build());
+			Order o = orderDao.save(bodyToDB(body,req));
+			dataList.add(dbToBean(o, new ArrayList<OrderDetail>()));
 			break;
 		default:
 			break;
@@ -207,7 +230,7 @@ public class JOLOrderInfo {
 	}
 	
 	public List<ORDER> getOrderDataByAccount(String account) {
-		List<Order> orderList = orderDao.findByAccount(account);
+		List<Order> orderList = orderDao.findByAccountOrderByOrderTimeDesc(account);
 		List<ORDER> dataList = new ArrayList<ORDER>();
 		List<OrderDetail> orderDetail = new ArrayList<OrderDetail>();
 		if (orderList.size() > 0) {
@@ -216,19 +239,42 @@ public class JOLOrderInfo {
 				for(OrderDetail o : orderDetail) {
 					o.setImgUrl(productDao.findByProdId(o.getProdId()).getImgUrl());
 				}
-				dataList.add(ORDER.builder().orderNo(order.getOrderNo()).account(order.getAccount())
-						.email(order.getEmail()).totalAmt(order.getTotalAmt())
-						.orderTime(order.getOrderTime()).status(order.getStatus())
-						.deliveryWay(order.getDeliveryWay()).deliveryNo(order.getDeliveryNo())
-						.orderName(order.getOrderName()).orderCity(order.getOrderCity())
-						.orderPhone(order.getOrderPhone()).orderDistrict(order.getOrderDistrict())
-						.orderAddress(order.getOrderAddress()).sendName(order.getSendName())
-						.sendCity(order.getSendCity()).sendAddress(order.getSendAddress())
-						.updateDt(order.getUpdateDt()).vehicle(order.getVehicle())
-						.vehicleType(order.getVehicleType()).payBy(order.getPayBy()).build());
+				dataList.add(dbToBean(order, orderDetail));
 			}
 		}
 		return dataList;
+	}
+	
+	
+	public ORDER dbToBean(Order order, List<OrderDetail> detailList) {
+		return ORDER.builder().orderNo(order.getOrderNo()).account(order.getAccount())
+				.email(order.getEmail()).totalAmt(order.getTotalAmt())
+				.orderTime(order.getOrderTime()).status(order.getStatus())
+				.deliveryWay(order.getDeliveryWay()).deliveryNo(order.getDeliveryNo())
+				.orderName(order.getOrderName()).orderCity(order.getOrderCity())
+				.orderPhone(order.getOrderPhone()).orderDistrict(order.getOrderDistrict())
+				.orderAddress(order.getOrderAddress()).sendName(order.getSendName())
+				.sendCity(order.getSendCity()).sendDistrict(order.getSendDistrict())
+				.sendAddress(order.getSendAddress()).updateDt(order.getUpdateDt())
+				.vehicle(order.getVehicle()).vehicleType(order.getVehicleType())
+				.payBy(order.getPayBy()).orderDetail(detailList).build();
+	}
+	
+	public Order bodyToDB(BODY body, Request req) {
+		LocalDateTime currentTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String now = currentTime.format(formatter);
+		return Order.builder()
+				.orderNo(body.getOrderNo()).account(req.getAccount())
+				.email(body.getEmail()).totalAmt(body.getTotalAmt())
+				.orderTime(now).status(body.getStatus()).deliveryWay(body.getDeliveryWay())
+				.deliveryNo(body.getDeliveryNo()).orderName(body.getOrderName())
+				.orderCity(body.getOrderCity()).orderPhone(body.getOrderPhone())
+				.orderDistrict(body.getOrderDistrict()).orderAddress(body.getOrderAddress())
+				.sendName(body.getSendName()).sendCity(body.getSendCity())
+				.sendDistrict(body.getSendDistrict()).sendAddress(body.getSendAddress())
+				.updateDt(now).vehicle(body.getVehicle()).sendPhone(body.getSendPhone())
+				.vehicleType(body.getVehicleType()).payBy(body.getPayBy()).build();
 	}
 	
 }

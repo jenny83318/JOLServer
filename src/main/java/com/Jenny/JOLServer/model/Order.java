@@ -36,6 +36,7 @@ public class Order {
 	private String sendName;
 	private String sendPhone;
 	private String sendCity;
+	private String sendDistrict;
 	private String sendAddress;
 	private String vehicleType;
 	private String vehicle;

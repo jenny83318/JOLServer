@@ -54,6 +54,8 @@ CREATE TABLE `jol_order` (
   `sendDistrict` char(10) DEFAULT NULL,
   `sendAddress` char(150) DEFAULT NULL,
   `vehicle` char(20) DEFAULT NULL,  
+  `payBy` char(15) DEFAULT NULL,  
+  `vehicleType` char(15) DEFAULT NULL,  
   `updateDt` datetime NOT NULL,
   PRIMARY KEY (`orderNo`),
   UNIQUE KEY `orderNo` (`orderNo`)

@@ -133,6 +133,8 @@ public class JOLCustomerInfo {
 						.name(body.getName())
 						.password(body.getPassword())
 						.phone(body.getPhone())
+						.city(body.getCity())
+						.district(body.getDistrict())
 						.status(body.getStatus()).build();
 				Customer updCustomer = custDao.save(newCust);
 				if (updCustomer != null) {

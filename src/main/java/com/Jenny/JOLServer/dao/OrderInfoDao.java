@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.Jenny.JOLServer.model.Order;
 
 public interface OrderInfoDao extends JpaRepository<Order, Integer> {
-	List<Order> findByAccount(String account);
+	List<Order> findByAccountOrderByOrderTimeDesc(String account);
 }
