@@ -1,7 +1,10 @@
 package com.Jenny.JOLServer.fun;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.modelmapper.ModelMapper;
@@ -13,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 import com.Jenny.JOLServer.common.Type;
 import com.Jenny.JOLServer.dao.OrderDetailDao;
+import com.Jenny.JOLServer.dao.ProductInfoDao;
 import com.Jenny.JOLServer.model.OrderDetail;
+import com.Jenny.JOLServer.model.Product;
 import com.Jenny.JOLServer.model.Request;
 import com.Jenny.JOLServer.tool.CustomException;
 
@@ -25,10 +30,13 @@ import lombok.NoArgsConstructor;
 @Service
 public class JOLOrderDetailInfo {
 	private static final Logger log = LoggerFactory.getLogger(JOLOrderDetailInfo.class);
-	
+
 	@Autowired
 	private OrderDetailDao orderDetailDao;
-	
+
+	@Autowired
+	private ProductInfoDao productDao;
+
 	@Data
 	@Builder
 	@NoArgsConstructor
@@ -41,7 +49,7 @@ public class JOLOrderDetailInfo {
 		private int price;
 		private String status;
 	}
-	
+
 	@Data
 	@Builder
 	public static class OUT {
@@ -49,64 +57,71 @@ public class JOLOrderDetailInfo {
 		private int code = 0;
 		@Builder.Default
 		private String msg = "";
+		@Builder.Default
+		private List<OrderDetail> detailList = new ArrayList<OrderDetail>();
 	}
-	
-	
+
 	protected Request check(Request req) throws Exception {
-		if ("UPDATE".equals(req.getType())) {
-			if (req.getBody().get("orderDetailNo") == null) {
-				throw new CustomException("PARAM NOT FOUND: orderDetailNo");
+		Field[] fields = BODY.builder().build().getClass().getDeclaredFields();
+		for (Field field : fields) {
+			String key = field.getName();
+			Object value = req.getBody().get(key);
+			if ("orderNo".equals(key)) {
+				throw new CustomException("PARAM NOT FOUND: " + key);
 			}
-		}
-		if ("ADD".equals(req.getType()) || "UPDATE".equals(req.getType())) {
-			if (req.getBody().get("orderNo") == null) {
-				throw new CustomException("PARAM NOT FOUND: orderNo");
+			if ("UPDATE".equals(req.getType()) && "orderDetailNo".equals(key)) {
+				if (value == null) {
+					throw new CustomException("PARAM NOT FOUND: " + key);
+				}
 			}
-			if (req.getBody().get("prodId") == null) {
-				throw new CustomException("PARAM NOT FOUND: prodId");
-			}
-			if (req.getBody().get("qty") == null) {
-				throw new CustomException("PARAM NOT FOUND: qty");
-			}
-			if (req.getBody().get("price") == null) {
-				throw new CustomException("PARAM NOT FOUND: price");
-			}
-			if (req.getBody().get("status") == null) {
-				throw new CustomException("PARAM NOT FOUND: status");
+			if (("ADD".equals(req.getType()) && !"orderDetailNo".equals(key)) || "UPDATE".equals(req.getType())) {
+				if (value == null) {
+					throw new CustomException("PARAM NOT FOUND: " + key);
+				}
 			}
 		}
 		return req;
 	}
-	
+
 	public BODY parser(Map<String, Object> map) {
 		ModelMapper modelMapper = new ModelMapper();
 		BODY body = modelMapper.map(map, BODY.class);
 		return body;
 	}
-	
+
 	public OUT doProcess(Request req) throws Exception {
 		check(req);
 		BODY body = parser(req.getBody());
-		log.info("body:{}",body.toString());
+		log.info("body:{}", body.toString());
+		List<OrderDetail> orderDetail = new ArrayList<OrderDetail>();
 		Type type = Type.getType(req.getType());
 		switch (type) {
+		case SELECT:
+			orderDetail = orderDetailDao.findByOrderNoAndAccount(body.getOrderNo(), req.getAccount());
+			for (OrderDetail o : orderDetail) {
+				log.info("detail:{}", o);
+				Product p = productDao.findByProdId(o.getProdId());
+				log.info("Product:{}", p);
+				o.setImgUrl(p.getImgUrl());
+				o.setProdName(p.getName());
+			}
+			break;
 		case ADD:
 		case UPDATE:
 			LocalDateTime currentTime = LocalDateTime.now();
-	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-	        String now = currentTime.format(formatter);
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			String now = currentTime.format(formatter);
 			OrderDetail o = orderDetailDao.save(OrderDetail.builder().account(req.getAccount())
-						.orderDetailNo(body.getOrderDetailNo()).orderNo(body.getOrderNo())
-						.price(body.getPrice()).prodId(body.getProdId()).qty(body.getQty())
-						.status(body.getStatus()).updateDt(now).build());	
-			if(o == null) {
+					.orderDetailNo(body.getOrderDetailNo()).orderNo(body.getOrderNo()).price(body.getPrice())
+					.prodId(body.getProdId()).qty(body.getQty()).status(body.getStatus()).updateDt(now).build());
+			if (o == null) {
 				return OUT.builder().code(999).msg("execute FAIL").build();
 			}
 			break;
 		default:
 			break;
 		}
-		return OUT.builder().code(HttpStatus.OK.value()).msg("execute success.").build();
+		return OUT.builder().code(HttpStatus.OK.value()).msg("execute success.").detailList(orderDetail).build();
 	}
 
 }

@@ -9,6 +9,6 @@ import com.Jenny.JOLServer.model.OrderDetail;
 
 @Repository
 public interface OrderDetailDao extends JpaRepository<OrderDetail, Integer>{
-	List<OrderDetail> findByOrderNo(int orderNo);
+	List<OrderDetail> findByOrderNoAndAccount(int orderNo, String account);
 	
 }

@@ -80,7 +80,7 @@ public class LogIn {
 				c.setTokenExpired(nextDayStr);
 				c.setToken(token);
 				Customer updCust = custDao.save(c);
-				out = OUT.builder().code(HttpStatus.OK.value()).msg("Success").token(updCust.getToken()).tokenExpired(updCust.getTokenExpired()).build();
+				out = OUT.builder().code(HttpStatus.OK.value()).msg("登入成功").token(updCust.getToken()).tokenExpired(updCust.getTokenExpired()).build();
 			} else {
 				log.info("c.getToken():{}",c.getToken());
 				log.info("body.getToken():{}",body.getToken());
@@ -89,19 +89,19 @@ public class LogIn {
 						c.setToken(null);
 						Customer updCust = custDao.save(c);
 						log.info("CLEAN:{}", updCust);
-						out = OUT.builder().code(HttpStatus.OK.value()).msg("Success").token(updCust.getToken()).tokenExpired(updCust.getTokenExpired()).build();
+						out = OUT.builder().code(HttpStatus.OK.value()).msg("登入成功").token(updCust.getToken()).tokenExpired(updCust.getTokenExpired()).build();
 					}
 				 else if (c.getToken().equals(body.getToken())) {
 			        LocalDateTime expired = LocalDateTime.parse(c.getTokenExpired(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 					int code = LocalDateTime.now().isAfter(expired) ? 777 : HttpStatus.OK.value();
-					String msg = code == 777 ? "token is expired" : "Success";
+					String msg = code == 777 ? "token期效已過" : "登入成功";
 					out = OUT.builder().code(code).msg(msg).token(c.getToken()).tokenExpired(c.getTokenExpired()).build();
 				} else {
-					out = OUT.builder().code(999).msg("Fail").token(null).tokenExpired(null).build();					
+					out = OUT.builder().code(999).msg("登入失敗").token(null).tokenExpired(null).build();					
 				}
 			}
 		} else {
-			out = OUT.builder().code(555).msg("帳號或密碼錯誤請重新輸入").token(null).tokenExpired(null).build();
+			out = OUT.builder().code(555).msg("帳號或密碼錯誤，請重新輸入。").token(null).tokenExpired(null).build();
 		}
 		return out;
 	}
