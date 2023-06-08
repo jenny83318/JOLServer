@@ -82,10 +82,12 @@ public class JOLOrderInfo {
 			String key = field.getName();
 			Object value = req.getBody().get(key);
 			if ("UPDATE".equals(req.getType()) && "orderNo".equals(key) && value == null) {
+					log.error("PARAM NOT FOUND: orderNo");
 					throw new CustomException("PARAM NOT FOUND: orderNo");
 			}
 			if (("ADD".equals(req.getType()) && !"orderNo".equals(key)) || "UPDATE".equals(req.getType())) {
 				if (value == null) {
+					log.error("PARAM NOT FOUND: {}",key);
 					throw new CustomException("PARAM NOT FOUND: " + key);
 				}
 			}

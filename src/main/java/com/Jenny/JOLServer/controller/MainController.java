@@ -11,6 +11,7 @@ import com.Jenny.JOLServer.fun.JOLCartInfo;
 import com.Jenny.JOLServer.fun.JOLCustomerInfo;
 import com.Jenny.JOLServer.fun.JOLOrderDetailInfo;
 import com.Jenny.JOLServer.fun.JOLOrderInfo;
+import com.Jenny.JOLServer.fun.JOLPayInfo;
 import com.Jenny.JOLServer.fun.JOLProductInfo;
 import com.Jenny.JOLServer.fun.LogIn;
 import com.Jenny.JOLServer.model.Request;
@@ -36,6 +37,9 @@ public class MainController {
 	
 	@Autowired()
 	private JOLOrderDetailInfo detailService;
+	
+	@Autowired()
+	private JOLPayInfo payService;
 	
 	@PostMapping("/json")
 	public Object Dispatcher(@RequestBody Request req) throws Exception{
@@ -68,6 +72,9 @@ public class MainController {
 		        break;
 		    case ORDERDETAIL:
 		    	out = detailService.doProcess(req);
+		    	break;
+		    case PAY:
+		    	out = payService.doProcess(req);
 		    	break;
 		}
 		return out;

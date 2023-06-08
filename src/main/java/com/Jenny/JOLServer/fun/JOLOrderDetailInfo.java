@@ -66,7 +66,8 @@ public class JOLOrderDetailInfo {
 		for (Field field : fields) {
 			String key = field.getName();
 			Object value = req.getBody().get(key);
-			if ("orderNo".equals(key)) {
+			if ("orderNo".equals(key) && value == null) {
+				log.error("PARAM NOT FOUND:ORDERNO:{}",value);
 				throw new CustomException("PARAM NOT FOUND: " + key);
 			}
 			if ("UPDATE".equals(req.getType()) && "orderDetailNo".equals(key)) {

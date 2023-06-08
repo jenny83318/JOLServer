@@ -6,7 +6,8 @@ public enum Fun {
 	PRODUCT("JOLProductInfo"),
 	CART("JOLCartInfo"),
 	ORDER("JOLOrderInfo"),
-	ORDERDETAIL("JOLOrderDetailInfo");
+	ORDERDETAIL("JOLOrderDetailInfo"),
+	PAY("JOLPayInfo");
 
 	private final String funName;
 
