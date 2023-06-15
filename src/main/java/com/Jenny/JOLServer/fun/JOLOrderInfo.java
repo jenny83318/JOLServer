@@ -91,6 +91,12 @@ public class JOLOrderInfo {
 					throw new CustomException("PARAM NOT FOUND: " + key);
 				}
 			}
+			if("OTHER".equals(req.getType())) {
+				if(("orderNo".equals(key) || "status".equals(key)) && value == null) {
+					log.error("PARAM NOT FOUND: {}",key);
+					throw new CustomException("PARAM NOT FOUND: " + key);
+				}
+			}
 		}
 		return req;
 	}
@@ -116,6 +122,10 @@ public class JOLOrderInfo {
 			Order o = orderDao.save(bodyToDB(body, req));
 			dataList.add(o);
 			break;
+		case OTHER:
+			Order order  = orderDao.findByOrderNoAndAccount(body.getOrderNo(), req.getAccount());
+			order.setStatus(body.getStatus());
+			orderDao.save(order);
 		default:
 			break;
 		}

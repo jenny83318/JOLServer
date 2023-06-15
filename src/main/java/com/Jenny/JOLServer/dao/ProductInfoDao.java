@@ -11,5 +11,6 @@ import com.Jenny.JOLServer.model.Product;
 public interface ProductInfoDao extends JpaRepository<Product, Integer> {
 	Product findByProdId(int id);
 	List<Product> findByNameContaining(String keyword);
-
+	List<Product> findBySeries(String series);
+	List<Product> findByCategory(String category);
 }

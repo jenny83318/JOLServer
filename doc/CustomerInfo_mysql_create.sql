@@ -30,6 +30,7 @@ CREATE TABLE `jol_product` (
 	`cost` int,
 	`qty` int,
 	`category` char(20) NOT NULL,
+	`series` char(20) NOT NULL,
 	`sizeInfo` char(50) NOT NULL,
 	PRIMARY KEY (`prodId`)
 );

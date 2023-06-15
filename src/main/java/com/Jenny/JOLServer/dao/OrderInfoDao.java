@@ -8,4 +8,5 @@ import com.Jenny.JOLServer.model.Order;
 
 public interface OrderInfoDao extends JpaRepository<Order, Integer> {
 	List<Order> findByAccountOrderByOrderTimeDesc(String account);
+	Order findByOrderNoAndAccount(int orderNo, String account);
 }

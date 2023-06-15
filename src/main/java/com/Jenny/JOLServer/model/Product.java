@@ -31,5 +31,6 @@ public class Product {
 	private Integer cost;
 	private Integer qty;
 	private String category;
+	private String series;
 	private String sizeInfo;
 }

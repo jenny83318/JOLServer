@@ -1,5 +1,6 @@
 package com.Jenny.JOLServer.fun;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,8 @@ public class JOLProductInfo {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class BODY {
+		private String selectType;
+		private String keyWord;
 		private Integer prodId;
 		private String name;
 		private String description;
@@ -44,6 +47,7 @@ public class JOLProductInfo {
 		private Integer cost;
 		private Integer qty;
 		private String category;
+		private String series;
 		private String size;
 	}
 	
@@ -56,38 +60,22 @@ public class JOLProductInfo {
 	}
 	
 	protected Request check(Request req) throws Exception {
-		if (!"ALL".equals(req.getType())) {
-			if (req.getBody().get("cartId") == null) {
-				throw new CustomException("PARAM NOT FOUND: prodId");
+		Field[] fields = BODY.builder().build().getClass().getDeclaredFields();
+		for (Field field : fields) {
+			String key = field.getName();
+			Object value = req.getBody().get(key);
+			if (!"ALL".equals(req.getType()) && !"OTHER".equals(req.getType()) && "prodId".equals(key) && value == null) {
+				throw new CustomException("PARAM NOT FOUND: " + key);
 			}
-		}
-		if ("ADD".equals(req.getType()) || "UPDATE".equals(req.getType())) {
-			if (req.getBody().get("name") == null) {
-				throw new CustomException("PARAM NOT FOUND: name");
+			if ("OTHER".equals(req.getType())) {
+				if ( ("keyWord".equals(key) ||  "selectType".equals(key) ) && value == null) {
+					throw new CustomException("PARAM NOT FOUND: " + key);
+				}
 			}
-			if (req.getBody().get("description") == null) {
-				throw new CustomException("PARAM NOT FOUND: qty");
-			}
-			if (req.getBody().get("imgUrl") == null) {
-				throw new CustomException("PARAM NOT FOUND: size");
-			}
-			if (req.getBody().get("updateDt") == null) {
-				throw new CustomException("PARAM NOT FOUND: updateDt");
-			}
-			if (req.getBody().get("createDt") == null) {
-				throw new CustomException("PARAM NOT FOUND: createDt");
-			}
-			if (req.getBody().get("price") == null) {
-				throw new CustomException("PARAM NOT FOUND: price");
-			}
-			if (req.getBody().get("cost") == null) {
-				throw new CustomException("PARAM NOT FOUND: cost");
-			}
-			if (req.getBody().get("qty") == null) {
-				throw new CustomException("PARAM NOT FOUND: qty");
-			}
-			if (req.getBody().get("category") == null) {
-				throw new CustomException("PARAM NOT FOUND: category");
+			if (("ADD".equals(req.getType())  || "UPDATE".equals(req.getType())) &&  !"keyWord".equals(key) &&  !"prodId".equals(key)) {
+				if (value == null) {
+					throw new CustomException("PARAM NOT FOUND: " + key);
+				}
 			}
 		}
 		return req;
@@ -111,6 +99,17 @@ public class JOLProductInfo {
 		case SELECT:
 			Product p = productDao.findByProdId(body.getProdId());
 			productList.add(p);
+			break;
+		case OTHER:
+			if("keyWord".equals(body.getSelectType())){
+				productList = productDao.findByNameContaining(body.getKeyWord());				
+			}else if("category".equals(body.getSelectType())) {
+				productList = productDao.findByCategory(body.getKeyWord());			
+			}else if("series".equals(body.getSelectType())) {
+				productList = productDao.findBySeries(body.getKeyWord());		
+			}
+			log.info("body.getSelectType :{}", body.getSelectType());
+			log.info("productList :{}", productList);
 			break;
 		case ADD:
 		case UPDATE:
