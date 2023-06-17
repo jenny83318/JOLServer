@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.Jenny.JOLServer.common.Fun;
 import com.Jenny.JOLServer.fun.JOLCartInfo;
 import com.Jenny.JOLServer.fun.JOLCustomerInfo;
+import com.Jenny.JOLServer.fun.JOLEmailInfo;
 import com.Jenny.JOLServer.fun.JOLOrderDetailInfo;
 import com.Jenny.JOLServer.fun.JOLOrderInfo;
 import com.Jenny.JOLServer.fun.JOLProductInfo;
@@ -49,6 +50,9 @@ public class MainController {
 
 	@Autowired()
 	private JOLOrderDetailInfo detailService;
+	
+	@Autowired()
+	private JOLEmailInfo emailService;
 
 
 	@PostMapping("/json")
@@ -83,6 +87,8 @@ public class MainController {
 		case ORDERDETAIL:
 			out = detailService.doProcess(req);
 			break;
+		case EMAIL:
+			out = emailService.doProcess(req);
 		}
 		return out;
 	}

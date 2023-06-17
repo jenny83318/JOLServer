@@ -27,6 +27,7 @@ public class OrderDetail {
 	private int prodId;
 	private int qty;
 	private int price;
+	private String size;
 	private String status;
 	private String updateDt;
 	@Transient

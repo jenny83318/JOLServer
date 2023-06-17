@@ -41,9 +41,10 @@ public class JOLOrderDetailInfo {
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class BODY {
+	public static class DTBODY {
 		private int orderDetailNo;
 		private int orderNo;
+		private String size;
 		private int prodId;
 		private int qty;
 		private int price;
@@ -62,7 +63,7 @@ public class JOLOrderDetailInfo {
 	}
 
 	protected Request check(Request req) throws Exception {
-		Field[] fields = BODY.builder().build().getClass().getDeclaredFields();
+		Field[] fields = DTBODY.builder().build().getClass().getDeclaredFields();
 		for (Field field : fields) {
 			String key = field.getName();
 			Object value = req.getBody().get(key);
@@ -83,15 +84,15 @@ public class JOLOrderDetailInfo {
 		return req;
 	}
 
-	public BODY parser(Map<String, Object> map) {
+	public DTBODY parser(Map<String, Object> map) {
 		ModelMapper modelMapper = new ModelMapper();
-		BODY body = modelMapper.map(map, BODY.class);
+		DTBODY body = modelMapper.map(map, DTBODY.class);
 		return body;
 	}
 
 	public OUT doProcess(Request req) throws Exception {
 		check(req);
-		BODY body = parser(req.getBody());
+		DTBODY body = parser(req.getBody());
 		log.info("body:{}", body.toString());
 		List<OrderDetail> orderDetail = new ArrayList<OrderDetail>();
 		Type type = Type.getType(req.getType());
@@ -113,7 +114,7 @@ public class JOLOrderDetailInfo {
 			String now = currentTime.format(formatter);
 			OrderDetail o = orderDetailDao.save(OrderDetail.builder().account(req.getAccount())
 					.orderDetailNo(body.getOrderDetailNo()).orderNo(body.getOrderNo()).price(body.getPrice())
-					.prodId(body.getProdId()).qty(body.getQty()).status(body.getStatus()).updateDt(now).build());
+					.prodId(body.getProdId()).qty(body.getQty()).size(body.getSize()).status(body.getStatus()).updateDt(now).build());
 			if (o == null) {
 				return OUT.builder().code(999).msg("execute FAIL").build();
 			}

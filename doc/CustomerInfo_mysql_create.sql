@@ -69,6 +69,7 @@ CREATE TABLE `jol_order_detail` (
 	`prodId` int NOT NULL,
 	`qty` int NOT NULL,
 	`price` int NOT NULL,
+	`size` char(10) NOT NULL,
 	`status` char(20) NOT NULL,
 	`updateDt` DATETIME NOT NULL,
 	PRIMARY KEY (`orderDetailNo`)
