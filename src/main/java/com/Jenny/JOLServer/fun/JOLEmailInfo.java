@@ -88,6 +88,7 @@ public class JOLEmailInfo {
 				.replaceAll("#Status", o.getStatus())
 				.replaceAll("#PayBy", o.getPayBy())
 				.replaceAll("#Shipment", o.getDeliveryWay())
+				.replaceAll("#DeliveryFee", Integer.toString("7-11超商取貨".equals(o.getDeliveryWay()) ? 60 : "宅配".equals(o.getDeliveryWay())  ? 80 : 0))
 				.replaceAll("#OrderAmt", Integer.toString(o.getTotalAmt()))
 				.replaceAll("#OrderDate", orderDate);
 		Map<String, Object> detailBody = new HashMap<String, Object>();		
