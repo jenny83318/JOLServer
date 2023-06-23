@@ -98,7 +98,7 @@ public class JOLOrderDetailInfo {
 		Type type = Type.getType(req.getType());
 		switch (type) {
 		case SELECT:
-			orderDetail = orderDetailDao.findByOrderNoAndAccount(body.getOrderNo(), req.getAccount());
+			orderDetail = orderDetailDao.findByOrderNoAndAccountOrderByProdId(body.getOrderNo(), req.getAccount());
 			for (OrderDetail o : orderDetail) {
 				log.info("detail:{}", o);
 				Product p = productDao.findByProdId(o.getProdId());
