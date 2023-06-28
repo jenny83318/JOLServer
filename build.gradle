@@ -6,8 +6,12 @@ plugins {
 }
 
 group = 'com.Jenny'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.0'
 sourceCompatibility = '11'
+
+ext{
+	pr_name = "JOLServer"
+}
 
 repositories {
 	mavenCentral()
@@ -35,6 +39,12 @@ dependencies {
 	
 }
 
-tasks.named('test') {
+
+test {
 	useJUnitPlatform()
 }
+
+tasks.named('build'){
+	dependsOn tasks.named('bootWar')
+}
+
