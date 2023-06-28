@@ -2,6 +2,8 @@ package com.Jenny.JOLServer.fun;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -169,9 +171,9 @@ public class JOLCartInfo {
 	}
 
 	public Cart bodyToCart(BODY body, Request req) {
-		LocalDateTime currentTime = LocalDateTime.now();
+		ZonedDateTime taipeiTime = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Taipei"));
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		String now = currentTime.format(formatter);
+		String now = taipeiTime.format(formatter);
 		return Cart.builder().account(req.getAccount()).cartId(body.getCartId()).isCart(body.isCart())
 				.prodId(body.getProdId()).qty(body.getQty()).size(body.getSize()).updateDt(now).build();
 	}

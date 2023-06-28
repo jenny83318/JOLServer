@@ -2,6 +2,8 @@ package com.Jenny.JOLServer.fun;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -115,7 +117,7 @@ public class JOLOrderInfo {
 		List<Order> dataList = new ArrayList<Order>();
 		switch (type) {
 		case SELECT:
-			dataList = orderDao.findByAccountOrderByOrderTimeDesc(req.getAccount());
+			dataList = orderDao.findByAccountOrderByOrderNoDesc(req.getAccount());
 			break;
 		case ADD:
 		case UPDATE:
@@ -134,9 +136,9 @@ public class JOLOrderInfo {
 	}
 
 	public Order bodyToDB(BODY body, Request req) {
-		LocalDateTime currentTime = LocalDateTime.now();
+		ZonedDateTime taipeiTime = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Taipei"));
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		String now = currentTime.format(formatter);
+		String now = taipeiTime.format(formatter);
 		return Order.builder().orderNo(body.getOrderNo()).account(req.getAccount()).email(body.getEmail())
 				.totalAmt(body.getTotalAmt()).orderTime(now).status(body.getStatus()).deliveryWay(body.getDeliveryWay())
 				.deliveryNo(body.getDeliveryNo()).orderName(body.getOrderName()).orderCity(body.getOrderCity())
