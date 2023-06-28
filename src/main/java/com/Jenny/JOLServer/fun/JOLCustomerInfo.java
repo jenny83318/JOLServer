@@ -121,9 +121,12 @@ public class JOLCustomerInfo {
 		case ADD:
 		case UPDATE:
 			Customer cust = custDao.findByAccount(req.getAccount());
+			Customer custEmail = custDao.findByEmail(body.getEmail());
 			if ("ADD".equals(type.getTypeName()) && cust != null) {
-				throw new CustomException("此帳號已存在，無法新增");
-			} else if ("UPDATE".equals(type.getTypeName()) && cust == null) {
+				return OUT.builder().custList(custList).code(HttpStatus.BAD_REQUEST.value()).msg("此帳號已註冊過，請換個帳號名稱試試").build();
+			}else if ("ADD".equals(type.getTypeName()) && custEmail != null){
+				return OUT.builder().custList(custList).code(HttpStatus.BAD_REQUEST.value()).msg("此email已註冊，請換個email試試").build();
+			}else if ("UPDATE".equals(type.getTypeName()) && cust == null) {
 				throw new CustomException("此帳號不存在，無法更新");
 			} else {
 				Customer newCust = Customer.builder()

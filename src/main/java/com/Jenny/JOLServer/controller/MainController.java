@@ -3,8 +3,6 @@ package com.Jenny.JOLServer.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +18,6 @@ import com.Jenny.JOLServer.fun.JOLOrderInfo;
 import com.Jenny.JOLServer.fun.JOLProductInfo;
 import com.Jenny.JOLServer.fun.LogIn;
 import com.Jenny.JOLServer.model.Request;
-import com.Jenny.JOLServer.model.StripePay;
 import com.Jenny.JOLServer.tool.CustomException;
 import com.google.gson.Gson;
 import com.stripe.Stripe;
@@ -28,10 +25,11 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 
+import lombok.Data;
+
 @RequestMapping("/api")
 @RestController
 public class MainController {
-	private static final Logger log = LoggerFactory.getLogger(MainController.class);
 	private static Gson gson = new Gson();
 	@Autowired()
 	private LogIn logIn;
@@ -54,6 +52,15 @@ public class MainController {
 	@Autowired()
 	private JOLEmailInfo emailService;
 
+	@Data
+	private static class StripePay {
+		private String name;
+		private String currency;
+		private String successUrl;
+		private String cancelUrl;
+		private long amount;
+		private long quantity;
+	}
 
 	@PostMapping("/json")
 	public Object Dispatcher(@RequestBody Request req) throws Exception {

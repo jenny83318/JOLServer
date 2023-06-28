@@ -1,13 +1,10 @@
 package com.Jenny.JOLServer.fun;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -20,9 +17,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.Jenny.JOLServer.dao.OrderDetailDao;
 import com.Jenny.JOLServer.dao.OrderInfoDao;
-import com.Jenny.JOLServer.fun.JOLOrderDetailInfo.DTBODY;
 import com.Jenny.JOLServer.model.Order;
 import com.Jenny.JOLServer.model.OrderDetail;
 import com.Jenny.JOLServer.model.Request;
@@ -44,8 +39,6 @@ public class JOLEmailInfo {
 	@Autowired()
 	private OrderInfoDao orderDao;
 	
-	@Autowired()
-	private OrderDetailDao detailDao;
 	
 	@Autowired()
 	private JOLOrderDetailInfo detailService;
@@ -97,7 +90,6 @@ public class JOLEmailInfo {
 		Request request = Request.builder().account(req.getAccount()).type("SELECT").fun("JOLOrderDetailInfo").body(detailBody).build();
 		List<OrderDetail> detailList = detailService.doProcess(request).getDetailList(); 
 		String content2 = "";
-		int i = 1;
 		for(OrderDetail detail : detailList) {
 			log.info("detail:{}",detail);
 			String oriContent2 = body.getContent2();
@@ -111,7 +103,6 @@ public class JOLEmailInfo {
 					.replaceAll("#Qty", Integer.toString(detail.getQty()))
 					.replaceAll("#SubTotal", Integer.toString(Math.round(detail.getQty() * detail.getPrice())))
 					.replaceAll("#Price", Integer.toString(detail.getPrice()));
-			i ++;
 		}
 		MimeMessage message = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message,true,"UTF-8");

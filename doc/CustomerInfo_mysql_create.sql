@@ -1,5 +1,4 @@
 use joldb;
-SHOW VARIABLES LIKE 'lower_case_table_names';
 CREATE TABLE `jol_customer` (
   `account` char(45) NOT NULL,
   `password` char(45) NOT NULL,
@@ -10,7 +9,6 @@ CREATE TABLE `jol_customer` (
   `district` char(20) NOT NULL,
   `address` char(150) NOT NULL,
   `status` tinyint(1) NOT NULL,
-  `payment` char(45) NOT NULL,
   `token` varchar(100) DEFAULT NULL,
   `token_expired` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`account`),
@@ -23,25 +21,25 @@ CREATE TABLE `jol_product` (
 	`prodId` int(11) NOT NULL AUTO_INCREMENT,
 	`name` char(50) NOT NULL,
 	`descript` char(255),
-	`imgURL` char(150) NOT NULL,
-	`createDt` DATETIME NOT NULL,
-	`updateDt` DATETIME NOT NULL,
+	`category` char(20) NOT NULL,
+	`series` char(20) NOT NULL,
 	`price` int NOT NULL,
 	`cost` int,
 	`qty` int,
-	`category` char(20) NOT NULL,
-	`series` char(20) NOT NULL,
+	`imgURL` char(150) NOT NULL,
 	`sizeInfo` char(50) NOT NULL,
+	`createDt` DATETIME NOT NULL,
+	`updateDt` DATETIME NOT NULL,
 	PRIMARY KEY (`prodId`)
 );
 
 CREATE TABLE `jol_order` (
   `orderNo` int(11) NOT NULL AUTO_INCREMENT,
-  `account` char(45) NOT NULL,
-  `email` char(50) DEFAULT NULL,
-  `totalAmt` int(11) NOT NULL,
   `orderTime` datetime NOT NULL,
+  `account` char(45) NOT NULL,
+  `totalAmt` int(11) NOT NULL,
   `status` char(20) NOT NULL,
+  `email` char(50) DEFAULT NULL,
   `deliveryWay` char(20) NOT NULL,
   `deliveryNo` char(20) NOT NULL,
   `orderName` char(20) DEFAULT NULL,
@@ -77,12 +75,12 @@ CREATE TABLE `jol_order_detail` (
 
 CREATE TABLE `jol_cart` (
 	`cartId` int NOT NULL AUTO_INCREMENT,
-	`prodId` int NOT NULL,
 	`account` char(45) NOT NULL,
+	`prodId` int NOT NULL,
 	`qty` int NOT NULL,
 	`size` char(10) NOT NULL,
-	`updateDt` DATETIME NOT NULL,
 	`isCart` BOOLEAN NOT NULL,
+	`updateDt` DATETIME NOT NULL,
 	PRIMARY KEY (`cartId`)
 );
 
