@@ -17,6 +17,7 @@ public interface CustomerInfoDao extends JpaRepository<Customer, Integer> {
 	Customer findByAccount(String account);
 	Customer findByEmail(String email);
 	Customer findByAccountAndPassword(String account, String password);
+	Customer findByAccountAndToken(String account, String token);
 	
     @Modifying
     @Query(value = DELETE_BY_ACCOUNT, nativeQuery = true)

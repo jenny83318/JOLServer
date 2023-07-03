@@ -37,7 +37,7 @@ public class JOLCartInfo {
 
 	@Autowired
 	private ProductInfoDao productDao;
-
+	
 	@Data
 	@Builder
 	@NoArgsConstructor

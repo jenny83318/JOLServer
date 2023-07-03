@@ -1,8 +1,7 @@
 package com.Jenny.JOLServer.fun;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -37,7 +36,6 @@ public class LogIn {
 	@AllArgsConstructor
 	public static class BODY {
 		private String password;
-		private String token;
 	}
 
 	@Data
@@ -55,7 +53,7 @@ public class LogIn {
 		BODY body = modelMapper.map(map, BODY.class);
 		return body;
 	}
-	
+
 	protected Request check(Request req) throws Exception {
 		if (req.getBody().get("password") == null) {
 			throw new CustomException("PARAM NOT FOUND: password");
@@ -63,7 +61,7 @@ public class LogIn {
 		if (req.getBody().get("token") == null) {
 			throw new CustomException("PARAM NOT FOUND: token");
 		}
-		
+
 		return req;
 	}
 
@@ -72,7 +70,7 @@ public class LogIn {
 		Customer c = custDao.findByAccountAndPassword(req.getAccount(), body.getPassword());
 		OUT out = OUT.builder().build();
 		if (c != null) {
-			if (c.getToken() == null) {
+			if (!"CHECK".equals(req.getType())) {
 				String token = UUID.randomUUID().toString();
 				Calendar calendar = Calendar.getInstance();
 				calendar.setTime(new Date());
@@ -82,28 +80,46 @@ public class LogIn {
 				c.setToken(token);
 				Customer updCust = custDao.save(c);
 				out = OUT.builder().code(HttpStatus.OK.value()).msg("登入成功").token(updCust.getToken()).tokenExpired(updCust.getTokenExpired()).email(updCust.getEmail()).build();
+			}
+			else if ("CLEAN".equals(req.getType())) {
+				c.setTokenExpired(null);
+				c.setToken(null);
+				Customer cleanCust = custDao.save(c);
+				log.info("CLEAN:{}", cleanCust);
+				out = OUT.builder().code(HttpStatus.OK.value()).msg("登入成功").token(cleanCust.getToken())
+						.tokenExpired(cleanCust.getTokenExpired()).email(cleanCust.getEmail()).build();
 			} else {
-				log.info("c.getToken():{}",c.getToken());
-				log.info("body.getToken():{}",body.getToken());
-				 if ("CLEAN".equals(req.getType()) ){
-						c.setTokenExpired(null);
-						c.setToken(null);
-						Customer updCust = custDao.save(c);
-						log.info("CLEAN:{}", updCust);
-						out = OUT.builder().code(HttpStatus.OK.value()).msg("登入成功").token(updCust.getToken()).tokenExpired(updCust.getTokenExpired()).email(updCust.getEmail()).build();
-					}
-				 else if (c.getToken().equals(body.getToken())) {
-			        LocalDateTime expired = LocalDateTime.parse(c.getTokenExpired(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-					int code = LocalDateTime.now().isAfter(expired) ? 777 : HttpStatus.OK.value();
-					String msg = code == 777 ? "token期效已過" : "登入成功";
-					out = OUT.builder().code(code).msg(msg).token(c.getToken()).tokenExpired(c.getTokenExpired()).email(c.getEmail()).build();
-				} else {
-					out = OUT.builder().code(999).msg("登入失敗，請重新再試").token(c.getToken()).tokenExpired(c.getTokenExpired()).email(c.getEmail()).build();					
-				}
+				out = OUT.builder().code(HttpStatus.OK.value()).msg("查詢成功").token(c.getToken()).tokenExpired(c.getTokenExpired()).email(c.getEmail()).build();
 			}
 		} else {
 			out = OUT.builder().code(555).msg("帳號或密碼錯誤，請重新輸入。").token(null).tokenExpired(null).email(null).build();
 		}
 		return out;
+	}
+
+	public OUT checkToken(String account, String token) {
+		OUT out = OUT.builder().build();
+		try {
+			Customer c = custDao.findByAccountAndToken(account, token);
+			if (c != null) {
+				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				Date tokenExpried;
+				tokenExpried = df.parse(c.getTokenExpired());
+				if (tokenExpried.before(new Date())) {
+					out = OUT.builder().code(666).msg("token過期").token(c.getToken()).tokenExpired(c.getTokenExpired())
+							.email(c.getEmail()).build();
+				} else {
+					out = OUT.builder().code(HttpStatus.OK.value()).msg("SUCCESS").token(c.getToken())
+							.tokenExpired(c.getTokenExpired()).email(c.getEmail()).build();
+				}
+			} else {
+				out = OUT.builder().code(666).msg("查無此帳號Token").build();
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+			log.error("PARSER ERROR: {}", e.getMessage());
+		}
+		return out;
+
 	}
 }
