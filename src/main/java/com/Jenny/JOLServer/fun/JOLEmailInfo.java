@@ -1,6 +1,7 @@
 package com.Jenny.JOLServer.fun;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import com.Jenny.JOLServer.dao.OrderInfoDao;
 import com.Jenny.JOLServer.model.Order;
 import com.Jenny.JOLServer.model.OrderDetail;
 import com.Jenny.JOLServer.model.Request;
+import com.Jenny.JOLServer.tool.CustomException;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -64,6 +66,20 @@ public class JOLEmailInfo {
 		@Builder.Default
 		private String msg = "";
 	}
+	
+	protected Request check(Request req) throws Exception {
+		Field[] fields = BODY.builder().build().getClass().getDeclaredFields();
+		for (Field field : fields) {
+			String key = field.getName();
+			Object value = req.getBody().get(key);
+			if(value == null) {				
+				log.error("PARAM NOT FOUND: {}",key);
+				throw new CustomException("PARAM NOT FOUND: " + key);
+			}
+		}
+		return req;
+	}
+
 	
 	public BODY parser(Map<String, Object> map) {
 		ModelMapper modelMapper = new ModelMapper();

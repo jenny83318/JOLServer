@@ -3,6 +3,8 @@ package com.Jenny.JOLServer.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +32,7 @@ import lombok.Data;
 @RequestMapping("/api")
 @RestController
 public class MainController {
+	private static final Logger log = LoggerFactory.getLogger(MainController.class);
 	private static Gson gson = new Gson();
 	@Autowired()
 	private LogIn logIn;
@@ -64,16 +67,21 @@ public class MainController {
 
 	@PostMapping("/json")
 	public Object Dispatcher(@RequestBody Request req) throws Exception {
+		log.info("REQ:{}",req);
 		if (req.getFun().isEmpty()) {
+			log.error("PARAM NOT FOUND: fun");
 			throw new CustomException("PARAM NOT FOUND: fun");
 		}
-		if (req.getAccount().isEmpty()) {
-			throw new CustomException("PARAM NOT FOUND: accounts");
+		if (!"JOLProductInfo".equals(req.getFun()) && req.getAccount().isEmpty()) {
+			log.error("PARAM NOT FOUND: account");
+			throw new CustomException("PARAM NOT FOUND: account");
 		}
 		if (!"LogIn".equals(req.getFun()) && req.getType().isEmpty()) {
+			log.error("PARAM NOT FOUND: type");
 			throw new CustomException("PARAM NOT FOUND: type");
 		}
-		if (!"LogIn".equals(req.getFun()) && req.getToken().isEmpty()) {
+		if (!"LogIn".equals(req.getFun()) && !"JOLProductInfo".equals(req.getFun()) && req.getToken().isEmpty()) {
+			log.error("PARAM NOT FOUND: token");
 			throw new CustomException("PARAM NOT FOUND: token");
 		}
 		if(!"LogIn".equals(req.getFun()) && !"JOLProductInfo".equals(req.getFun())) {
@@ -106,6 +114,7 @@ public class MainController {
 		case EMAIL:
 			out = emailService.doProcess(req);
 		}
+		log.info("RES:{}",out);
 		return out;
 	}
 

@@ -65,15 +65,18 @@ public class JOLProductInfo {
 			String key = field.getName();
 			Object value = req.getBody().get(key);
 			if (!"ALL".equals(req.getType()) && !"OTHER".equals(req.getType()) && "prodId".equals(key) && value == null) {
+				log.error("PARAM NOT FOUND: {}",key);
 				throw new CustomException("PARAM NOT FOUND: " + key);
 			}
 			if ("OTHER".equals(req.getType())) {
 				if ( ("keyWord".equals(key) ||  "selectType".equals(key) ) && value == null) {
+					log.error("PARAM NOT FOUND: {}",key);
 					throw new CustomException("PARAM NOT FOUND: " + key);
 				}
 			}
 			if (("ADD".equals(req.getType())  || "UPDATE".equals(req.getType())) &&  !"keyWord".equals(key) &&  !"prodId".equals(key)) {
 				if (value == null) {
+					log.error("PARAM NOT FOUND: {}",key);
 					throw new CustomException("PARAM NOT FOUND: " + key);
 				}
 			}

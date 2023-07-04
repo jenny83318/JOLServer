@@ -1,5 +1,6 @@
 package com.Jenny.JOLServer.fun;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,7 @@ public class JOLCustomerInfo {
 		private String district;
 		private String address;
 		private Integer status;
+		private String tokenExpired;
 	}
 
 	@Data
@@ -70,30 +72,13 @@ public class JOLCustomerInfo {
 	}
 
 	protected Request check(Request req) throws Exception {
-		if ("ADD".equals(req.getType()) || "UPDATE".equals(req.getType())) {
-			if (req.getBody().get("email") == null) {
-				throw new CustomException("PARAM NOT FOUND: email");
-			}
-			if (req.getBody().get("password") == null) {
-				throw new CustomException("PARAM NOT FOUND: password");
-			}
-			if (req.getBody().get("name") == null) {
-				throw new CustomException("PARAM NOT FOUND: name");
-			}
-			if (req.getBody().get("address") == null) {
-				throw new CustomException("PARAM NOT FOUND: address");
-			}
-			if (req.getBody().get("phone") == null) {
-				throw new CustomException("PARAM NOT FOUND: phone");
-			}
-			if (req.getBody().get("status") == null) {
-				throw new CustomException("PARAM NOT FOUND: status");
-			}
-			if (req.getBody().get("city") == null) {
-				throw new CustomException("PARAM NOT FOUND: city");
-			}
-			if (req.getBody().get("district") == null) {
-				throw new CustomException("PARAM NOT FOUND: district");
+		Field[] fields = BODY.builder().build().getClass().getDeclaredFields();
+		for (Field field : fields) {
+			String key = field.getName();
+			Object value = req.getBody().get(key);
+			if (("UPDATE".equals(req.getType()) || "ADD".equals(req.getType())) && value == null) {
+				log.error("PARAM NOT FOUND: {}",key);
+				throw new CustomException("PARAM NOT FOUND: " + key);
 			}
 		}
 		return req;
@@ -123,22 +108,17 @@ public class JOLCustomerInfo {
 			Customer cust = custDao.findByAccount(req.getAccount());
 			Customer custEmail = custDao.findByEmail(body.getEmail());
 			if ("ADD".equals(type.getTypeName()) && cust != null) {
-				return OUT.builder().custList(custList).code(HttpStatus.BAD_REQUEST.value()).msg("此帳號已註冊過，請換個帳號名稱試試").build();
-			}else if ("ADD".equals(type.getTypeName()) && custEmail != null){
-				return OUT.builder().custList(custList).code(HttpStatus.BAD_REQUEST.value()).msg("此email已註冊，請換個email試試").build();
-			}else if ("UPDATE".equals(type.getTypeName()) && cust == null) {
+				return OUT.builder().custList(custList).code(HttpStatus.BAD_REQUEST.value()).msg("此帳號已註冊過，請換個帳號名稱試試")
+						.build();
+			} else if ("ADD".equals(type.getTypeName()) && custEmail != null) {
+				return OUT.builder().custList(custList).code(HttpStatus.BAD_REQUEST.value()).msg("此email已註冊，請換個email試試")
+						.build();
+			} else if ("UPDATE".equals(type.getTypeName()) && cust == null) {
 				throw new CustomException("此帳號不存在，無法更新");
 			} else {
-				Customer newCust = Customer.builder()
-						.account(req.getAccount())
-						.address(body.address)
-						.email(body.getEmail())
-						.name(body.getName())
-						.password(body.getPassword())
-						.phone(body.getPhone())
-						.city(body.getCity())
-						.district(body.getDistrict())
-						.status(body.getStatus()).build();
+				Customer newCust = Customer.builder().account(req.getAccount()).address(body.address)
+						.email(body.getEmail()).name(body.getName()).password(body.getPassword()).phone(body.getPhone())
+						.city(body.getCity()).district(body.getDistrict()).status(body.getStatus()).token(req.getToken()).tokenExpired(body.getTokenExpired()).build();
 				Customer updCustomer = custDao.save(newCust);
 				if (updCustomer != null) {
 					custList.add(updCustomer);

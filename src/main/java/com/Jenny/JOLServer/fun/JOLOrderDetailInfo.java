@@ -70,15 +70,18 @@ public class JOLOrderDetailInfo {
 			String key = field.getName();
 			Object value = req.getBody().get(key);
 			if ("orderNo".equals(key) && value == null) {
+				log.error("PARAM NOT FOUND: {}",key);
 				throw new CustomException("PARAM NOT FOUND: " + key);
 			}
 			if ("UPDATE".equals(req.getType()) && "orderDetailNo".equals(key)) {
 				if (value == null) {
+					log.error("PARAM NOT FOUND: {}",key);
 					throw new CustomException("PARAM NOT FOUND: " + key);
 				}
 			}
 			if (("ADD".equals(req.getType()) && !"orderDetailNo".equals(key)) || "UPDATE".equals(req.getType())) {
 				if (value == null) {
+					log.error("PARAM NOT FOUND: {}",key);
 					throw new CustomException("PARAM NOT FOUND: " + key);
 				}
 			}
