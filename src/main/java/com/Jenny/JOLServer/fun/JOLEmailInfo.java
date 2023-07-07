@@ -30,7 +30,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 @Service
 public class JOLEmailInfo {
-	private static final Logger log = LoggerFactory.getLogger(JOLOrderDetailInfo.class);
+	private static final Logger log = LoggerFactory.getLogger(JOLEmailInfo.class);
 
 	private JavaMailSender mailSender = null;
 	
@@ -88,6 +88,7 @@ public class JOLEmailInfo {
 	}
 	
 	public OUT doProcess(Request req) throws Exception{
+		log.info("SECND EMAIL REQ:{}" , req);
 		BODY body = parser(req.getBody());
 		Order o = orderDao.findByOrderNoAndAccount(body.getOrderNo(), req.getAccount());
 		String orderNo = String.format("%05d", o.getOrderNo());
@@ -129,6 +130,7 @@ public class JOLEmailInfo {
 		File image = new File("src/main/resources/image/JOLBoutique-logo.png");
 		helper.addInline( "image", image);
 		mailSender.send(message);
+		log.info("SECND EMAIL response==========>" );
 		return OUT.builder().code(HttpStatus.OK.value()).msg("execute success.").build();
 	}
 	
