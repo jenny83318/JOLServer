@@ -131,7 +131,6 @@ public class JOLOrderInfo {
 		default:
 			break;
 		}
-		log.info("dataList:{}", dataList);
 		return OUT.builder().code(HttpStatus.OK.value()).msg("execute success.").orderList(dataList).build();
 	}
 

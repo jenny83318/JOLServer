@@ -76,6 +76,8 @@ public class JOLCustomerInfo {
 		for (Field field : fields) {
 			String key = field.getName();
 			Object value = req.getBody().get(key);
+			log.info("key:{}",key);
+			log.info("value:{}",value);
 			if (("UPDATE".equals(req.getType()) || "ADD".equals(req.getType())) && value == null) {
 				log.error("PARAM NOT FOUND: {}",key);
 				throw new CustomException("PARAM NOT FOUND: " + key);
