@@ -13,8 +13,7 @@ CREATE TABLE `jol_customer` (
   `token_expired` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`account`),
   UNIQUE KEY `account` (`account`),
-  UNIQUE KEY `email` (`email`),
-  UNIQUE KEY `token_UNIQUE` (`token`)
+  UNIQUE KEY `email` (`email`)
 ) ;
 
 CREATE TABLE `jol_product` (

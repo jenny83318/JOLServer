@@ -80,11 +80,13 @@ public class MainController {
 			log.error("PARAM NOT FOUND: type");
 			throw new CustomException("PARAM NOT FOUND: type");
 		}
-		if (!"LogIn".equals(req.getFun()) && !"JOLProductInfo".equals(req.getFun()) && req.getToken().isEmpty()) {
+		if (!"LogIn".equals(req.getFun()) && !"JOLProductInfo".equals(req.getFun()) && req.getToken().isEmpty()
+				&& ! ("JOLCustomerInfo".equals(req.getFun()) && "ADD".equals(req.getType()))) {
 			log.error("PARAM NOT FOUND: token");
 			throw new CustomException("PARAM NOT FOUND: token");
 		}
-		if(!"LogIn".equals(req.getFun()) && !"JOLProductInfo".equals(req.getFun())) {
+		if(!"LogIn".equals(req.getFun()) && !"JOLProductInfo".equals(req.getFun())
+			&& ! ("JOLCustomerInfo".equals(req.getFun()) && "ADD".equals(req.getType()))) {
 			LogIn.OUT c = this.logIn.checkToken(req.getAccount(), req.getToken());
 			if(c.getCode() != 200) {
 				return c;

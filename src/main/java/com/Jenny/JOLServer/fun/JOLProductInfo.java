@@ -112,7 +112,6 @@ public class JOLProductInfo {
 				productList = productDao.findBySeries(body.getKeyWord());		
 			}
 			log.info("body.getSelectType :{}", body.getSelectType());
-			log.info("productList :{}", productList);
 			break;
 		case ADD:
 		case UPDATE:
