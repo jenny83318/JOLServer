@@ -163,7 +163,7 @@ public class JOLCartInfo {
 		if (newCart != null) {
 			cartList = getProductByCart(
 					cartDao.findByAccountAndIsCartOrderByUpdateDtDesc(req.getAccount(), body.isCart));
-			log.info("cartList:{}", cartList);
+//			log.info("cartList:{}", cartList);
 		} else {
 			return OUT.builder().code(999).msg("新增或更新失敗").build();
 		}

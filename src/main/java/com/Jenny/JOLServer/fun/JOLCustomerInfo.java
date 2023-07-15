@@ -76,7 +76,13 @@ public class JOLCustomerInfo {
 		for (Field field : fields) {
 			String key = field.getName();
 			Object value = req.getBody().get(key);
+<<<<<<< HEAD
 			if (("UPDATE".equals(req.getType()) || ("ADD".equals(req.getType())) && value == null && !"tokenExpired".equals(key)) ) {
+=======
+			log.info("key:{}",key);
+			log.info("value:{}",value);
+			if (("UPDATE".equals(req.getType()) || "ADD".equals(req.getType())) && value == null) {
+>>>>>>> cb0606901d153585e494fa45250e910e8362d3e5
 				log.error("PARAM NOT FOUND: {}",key);
 				throw new CustomException("PARAM NOT FOUND: " + key);
 			}

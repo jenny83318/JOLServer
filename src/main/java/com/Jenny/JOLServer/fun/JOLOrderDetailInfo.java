@@ -105,9 +105,7 @@ public class JOLOrderDetailInfo {
 		case SELECT:
 			orderDetail = orderDetailDao.findByOrderNoAndAccountOrderByProdId(body.getOrderNo(), req.getAccount());
 			for (OrderDetail o : orderDetail) {
-				log.info("detail:{}", o);
 				Product p = productDao.findByProdId(o.getProdId());
-				log.info("Product:{}", p);
 				o.setImgUrl(p.getImgUrl());
 				o.setProdName(p.getName());
 			}
