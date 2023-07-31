@@ -76,14 +76,11 @@ public class JOLCustomerInfo {
 		for (Field field : fields) {
 			String key = field.getName();
 			Object value = req.getBody().get(key);
-<<<<<<< HEAD
-			if (("UPDATE".equals(req.getType()) || ("ADD".equals(req.getType())) && value == null && !"tokenExpired".equals(key)) ) {
-=======
-			log.info("key:{}",key);
-			log.info("value:{}",value);
-			if (("UPDATE".equals(req.getType()) || "ADD".equals(req.getType())) && value == null) {
->>>>>>> cb0606901d153585e494fa45250e910e8362d3e5
-				log.error("PARAM NOT FOUND: {}",key);
+			if (("UPDATE".equals(req.getType())
+					|| ("ADD".equals(req.getType())) && value == null && !"tokenExpired".equals(key))) {
+				log.info("key:{}", key);
+				log.info("value:{}", value);
+				log.error("PARAM NOT FOUND: {}", key);
 				throw new CustomException("PARAM NOT FOUND: " + key);
 			}
 		}
@@ -124,7 +121,8 @@ public class JOLCustomerInfo {
 			} else {
 				Customer newCust = Customer.builder().account(req.getAccount()).address(body.address)
 						.email(body.getEmail()).name(body.getName()).password(body.getPassword()).phone(body.getPhone())
-						.city(body.getCity()).district(body.getDistrict()).status(body.getStatus()).token(req.getToken()).tokenExpired(body.getTokenExpired()).build();
+						.city(body.getCity()).district(body.getDistrict()).status(body.getStatus())
+						.token(req.getToken()).tokenExpired(body.getTokenExpired()).build();
 				Customer updCustomer = custDao.save(newCust);
 				if (updCustomer != null) {
 					custList.add(updCustomer);
