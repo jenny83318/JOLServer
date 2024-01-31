@@ -16,22 +16,6 @@ CREATE TABLE `jol_customer` (
   UNIQUE KEY `email` (`email`)
 ) ;
 
-CREATE TABLE `jol_product` (
-	`prodId` int(11) NOT NULL AUTO_INCREMENT,
-	`name` char(50) NOT NULL,
-	`descript` char(255),
-	`category` char(20) NOT NULL,
-	`series` char(20) NOT NULL,
-	`price` int NOT NULL,
-	`cost` int,
-	`qty` int,
-	`imgURL` char(150) NOT NULL,
-	`sizeInfo` char(50) NOT NULL,
-	`createDt` DATETIME NOT NULL,
-	`updateDt` DATETIME NOT NULL,
-	PRIMARY KEY (`prodId`)
-);
-
 CREATE TABLE `jol_order` (
   `orderNo` int(11) NOT NULL AUTO_INCREMENT,
   `orderTime` datetime NOT NULL,
