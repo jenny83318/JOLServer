@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -30,7 +31,6 @@ import lombok.NoArgsConstructor;
 /**
  * { "fun":"JOLOrderInfo", "account":"peter1234", "body":{ "type":"ADD",
  * "totalAmt":3630, "shipNo":"263622", "isOrderDetail":0, "status":"prepare"
- * 
  * }
  * 
  */
@@ -75,10 +75,10 @@ public class JOLOrderInfo {
 		@Builder.Default
 		private String msg = "";
 		@Builder.Default
-		private List<Order> orderList = new ArrayList<Order>();
+		private List<Order> orderList = new ArrayList<>();
 	}
 
-	protected Request check(Request req) throws Exception {
+	protected void check(Request req)  {
 		Field[] fields =  BODY.builder().build().getClass().getDeclaredFields();
 		for (Field field : fields) {
 			String key = field.getName();
@@ -100,22 +100,20 @@ public class JOLOrderInfo {
 				}
 			}
 		}
-		return req;
 	}
 
 	public BODY parser(Map<String, Object> map) {
 		ModelMapper modelMapper = new ModelMapper();
-		BODY body = modelMapper.map(map, BODY.class);
-		return body;
+		return modelMapper.map(map, BODY.class);
 	}
 
-	public OUT doProcess(Request req) throws Exception {
+	public OUT doProcess(Request req) {
 		check(req);
 		BODY body = parser(req.getBody());
 		log.info("body:{}", body.toString());
 		Type type = Type.getType(req.getType());
-		List<Order> dataList = new ArrayList<Order>();
-		switch (type) {
+		List<Order> dataList = new ArrayList<>();
+		switch (Objects.requireNonNull(type)) {
 		case SELECT:
 			dataList = orderDao.findByAccountOrderByOrderNoDesc(req.getAccount());
 			break;

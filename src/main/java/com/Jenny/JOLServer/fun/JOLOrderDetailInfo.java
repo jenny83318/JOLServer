@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -43,7 +44,7 @@ public class JOLOrderDetailInfo {
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class DTBODY {
+	public static class DetailBody {
 		private int orderDetailNo;
 		private int orderNo;
 		private String size;
@@ -61,11 +62,11 @@ public class JOLOrderDetailInfo {
 		@Builder.Default
 		private String msg = "";
 		@Builder.Default
-		private List<OrderDetail> detailList = new ArrayList<OrderDetail>();
+		private List<OrderDetail> detailList = new ArrayList<>();
 	}
 
-	protected Request check(Request req) throws Exception {
-		Field[] fields = DTBODY.builder().build().getClass().getDeclaredFields();
+	protected void check(Request req) {
+		Field[] fields = DetailBody.builder().build().getClass().getDeclaredFields();
 		for (Field field : fields) {
 			String key = field.getName();
 			Object value = req.getBody().get(key);
@@ -86,22 +87,20 @@ public class JOLOrderDetailInfo {
 				}
 			}
 		}
-		return req;
 	}
 
-	public DTBODY parser(Map<String, Object> map) {
+	public DetailBody parser(Map<String, Object> map) {
 		ModelMapper modelMapper = new ModelMapper();
-		DTBODY body = modelMapper.map(map, DTBODY.class);
-		return body;
+		return modelMapper.map(map, DetailBody.class);
 	}
 
-	public OUT doProcess(Request req) throws Exception {
+	public OUT doProcess(Request req)  {
 		check(req);
-		DTBODY body = parser(req.getBody());
+		DetailBody body = parser(req.getBody());
 		log.info("body:{}", body.toString());
-		List<OrderDetail> orderDetail = new ArrayList<OrderDetail>();
+		List<OrderDetail> orderDetail = new ArrayList<>();
 		Type type = Type.getType(req.getType());
-		switch (type) {
+		switch (Objects.requireNonNull(type)) {
 		case SELECT:
 			orderDetail = orderDetailDao.findByOrderNoAndAccountOrderByProdId(body.getOrderNo(), req.getAccount());
 			for (OrderDetail o : orderDetail) {
@@ -115,12 +114,9 @@ public class JOLOrderDetailInfo {
 			ZonedDateTime taipeiTime = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Taipei"));
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 			String now = taipeiTime.format(formatter);
-			OrderDetail o = orderDetailDao.save(OrderDetail.builder().account(req.getAccount())
+			orderDetailDao.save(OrderDetail.builder().account(req.getAccount())
 					.orderDetailNo(body.getOrderDetailNo()).orderNo(body.getOrderNo()).price(body.getPrice())
 					.prodId(body.getProdId()).qty(body.getQty()).size(body.getSize()).status(body.getStatus()).updateDt(now).build());
-			if (o == null) {
-				return OUT.builder().code(999).msg("execute FAIL").build();
-			}
 			break;
 		default:
 			break;

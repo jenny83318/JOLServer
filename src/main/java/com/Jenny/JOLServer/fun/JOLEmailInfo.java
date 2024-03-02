@@ -32,9 +32,9 @@ import lombok.NoArgsConstructor;
 public class JOLEmailInfo {
 	private static final Logger log = LoggerFactory.getLogger(JOLEmailInfo.class);
 
-	private JavaMailSender mailSender = null;
+	private final JavaMailSender mailSender;
 	
-	@Autowired(required=true)
+	@Autowired()
 	public JOLEmailInfo (JavaMailSender mailSender ) {
 		this.mailSender = mailSender;
 	}
@@ -67,7 +67,7 @@ public class JOLEmailInfo {
 		private String msg = "";
 	}
 	
-	protected Request check(Request req) throws Exception {
+	protected void check(Request req)  {
 		Field[] fields = BODY.builder().build().getClass().getDeclaredFields();
 		for (Field field : fields) {
 			String key = field.getName();
@@ -77,49 +77,38 @@ public class JOLEmailInfo {
 				throw new CustomException("PARAM NOT FOUND: " + key);
 			}
 		}
-		return req;
 	}
 
 	
 	public BODY parser(Map<String, Object> map) {
 		ModelMapper modelMapper = new ModelMapper();
-		BODY body = modelMapper.map(map, BODY.class);
-		return body;
+		return modelMapper.map(map, BODY.class);
 	}
 	
 	public OUT doProcess(Request req) throws Exception{
-		log.info("SECND EMAIL REQ:{}" , req);
+		log.info("SEND EMAIL REQ:{}" , req);
 		BODY body = parser(req.getBody());
 		Order o = orderDao.findByOrderNoAndAccount(body.getOrderNo(), req.getAccount());
-		String orderNo = String.format("%05d", o.getOrderNo());
-		String orderDate = o.getOrderTime().substring(0,10);
-		String content1 =  body.getContent1()
-				.replaceAll("#OrderNo", orderNo)
-				.replaceAll("#Status", o.getStatus())
-				.replaceAll("#PayBy", o.getPayBy())
-				.replaceAll("#Shipment", o.getDeliveryWay())
-				.replaceAll("#DeliveryFee", Integer.toString("7-11超商取貨".equals(o.getDeliveryWay()) ? 60 : "宅配".equals(o.getDeliveryWay())  ? 80 : 0))
-				.replaceAll("#OrderAmt", Integer.toString(o.getTotalAmt()))
-				.replaceAll("#OrderDate", orderDate);
-		Map<String, Object> detailBody = new HashMap<String, Object>();		
+		String content1 = getString(o, body);
+		Map<String, Object> detailBody = new HashMap<>();
 		detailBody.put("orderNo", o.getOrderNo());
 		detailBody.put("account", o.getAccount());
 		Request request = Request.builder().account(req.getAccount()).type("SELECT").fun("JOLOrderDetailInfo").body(detailBody).build();
-		List<OrderDetail> detailList = detailService.doProcess(request).getDetailList(); 
-		String content2 = "";
+		List<OrderDetail> detailList = detailService.doProcess(request).getDetailList();
+		StringBuilder content2 = new StringBuilder();
 		for(OrderDetail detail : detailList) {
 			log.info("detail:{}",detail);
 			String oriContent2 = body.getContent2();
 			String[] img = detail.getImgUrl().split(",");
 			log.info("imgURL:{}", img[0] );
-			content2 += oriContent2
-					.replaceAll("#ProdNo", String.format("%05d", detail.getProdId()))
-					.replaceAll("#ProdName", detail.getProdName())
-					.replaceAll("#ProdImg", img[0])
-					.replaceAll("#Size", detail.getSize())
-					.replaceAll("#Qty", Integer.toString(detail.getQty()))
-					.replaceAll("#SubTotal", Integer.toString(Math.round(detail.getQty() * detail.getPrice())))
-					.replaceAll("#Price", Integer.toString(detail.getPrice()));
+			content2.append(oriContent2
+                    .replaceAll("#ProdNo", String.format("%05d", detail.getProdId()))
+                    .replaceAll("#ProdName", detail.getProdName())
+                    .replaceAll("#ProdImg", img[0])
+                    .replaceAll("#Size", detail.getSize())
+                    .replaceAll("#Qty", Integer.toString(detail.getQty()))
+                    .replaceAll("#SubTotal", Integer.toString(detail.getQty() * detail.getPrice()))
+                    .replaceAll("#Price", Integer.toString(detail.getPrice())));
 		}
 		MimeMessage message = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message,true,"UTF-8");
@@ -130,8 +119,21 @@ public class JOLEmailInfo {
 		File image = new File("src/main/resources/image/JOLBoutique-logo.png");
 		helper.addInline( "image", image);
 		mailSender.send(message);
-		log.info("SECND EMAIL response==========>" );
+		log.info("SEND EMAIL response==========>" );
 		return OUT.builder().code(HttpStatus.OK.value()).msg("execute success.").build();
 	}
-	
+
+	private static String getString(Order o, BODY body) {
+		String orderNo = String.format("%05d", o.getOrderNo());
+		String orderDate = o.getOrderTime().substring(0,10);
+		return body.getContent1()
+				.replaceAll("#OrderNo", orderNo)
+				.replaceAll("#Status", o.getStatus())
+				.replaceAll("#PayBy", o.getPayBy())
+				.replaceAll("#Shipment", o.getDeliveryWay())
+				.replaceAll("#DeliveryFee", Integer.toString("7-11超商取貨".equals(o.getDeliveryWay()) ? 60 : "宅配".equals(o.getDeliveryWay())  ? 80 : 0))
+				.replaceAll("#OrderAmt", Integer.toString(o.getTotalAmt()))
+				.replaceAll("#OrderDate", orderDate);
+	}
+
 }

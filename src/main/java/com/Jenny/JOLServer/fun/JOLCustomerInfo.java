@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -32,10 +33,10 @@ import lombok.NoArgsConstructor;
     "fun":"JOLCustomerInfo",
     "body":{
     "account": "abc1235",
-    "password": "vjsklemmr",
+    "password": "abc8288383",
     "name": "林曉涵",
     "phone": "0915526665",
-    "email": "wewwwwwwww",
+    "email": "anfj@gmail.com",
     "status": 1
 }
 }
@@ -45,7 +46,7 @@ public class JOLCustomerInfo {
 	private static final Logger log = LoggerFactory.getLogger(JOLCustomerInfo.class);
 
 	@Autowired
-	private CustomerInfoDao custDao;
+	private CustomerInfoDao customerDao;
 
 	@Data
 	@Builder
@@ -71,7 +72,7 @@ public class JOLCustomerInfo {
 		private List<Customer> custList;
 	}
 
-	protected Request check(Request req) throws Exception {
+	protected void check(Request req) {
 		Field[] fields = BODY.builder().build().getClass().getDeclaredFields();
 		for (Field field : fields) {
 			String key = field.getName();
@@ -84,60 +85,54 @@ public class JOLCustomerInfo {
 				throw new CustomException("PARAM NOT FOUND: " + key);
 			}
 		}
-		return req;
 	}
 
 	public BODY parser(Map<String, Object> map) {
 		ModelMapper modelMapper = new ModelMapper();
-		BODY body = modelMapper.map(map, BODY.class);
-		return body;
+        return modelMapper.map(map, BODY.class);
 	}
 
-	public OUT doProcess(Request req) throws Exception {
+	public OUT doProcess(Request req) {
 		check(req);
 		BODY body = parser(req.getBody());
-		List<Customer> custList = new ArrayList<Customer>();
+		List<Customer> custList = new ArrayList<>();
 		Type type = Type.getType(req.getType());
-		switch (type) {
+		switch (Objects.requireNonNull(type)) {
 		case ALL:
-			custList = custDao.findAll();
+			custList = customerDao.findAll();
 			break;
 		case SELECT:
-			Customer c = custDao.findByAccount(req.getAccount());
+			Customer c = customerDao.findByAccount(req.getAccount());
 			custList.add(c == null ? Customer.builder().build() : c);
 			break;
 		case ADD:
 		case UPDATE:
-			Customer cust = custDao.findByAccount(req.getAccount());
-			Customer custEmail = custDao.findByEmail(body.getEmail());
-			if ("ADD".equals(type.getTypeName()) && cust != null) {
+			Customer customer = customerDao.findByAccount(req.getAccount());
+			Customer customerEmail = customerDao.findByEmail(body.getEmail());
+			if ("ADD".equals(type.getTypeName()) && customer != null) {
 				return OUT.builder().custList(custList).code(HttpStatus.BAD_REQUEST.value()).msg("此帳號已註冊過，請換個帳號名稱試試")
 						.build();
-			} else if ("ADD".equals(type.getTypeName()) && custEmail != null) {
+			} else if ("ADD".equals(type.getTypeName()) && customerEmail != null) {
 				return OUT.builder().custList(custList).code(HttpStatus.BAD_REQUEST.value()).msg("此email已註冊，請換個email試試")
 						.build();
-			} else if ("UPDATE".equals(type.getTypeName()) && cust == null) {
+			} else if ("UPDATE".equals(type.getTypeName()) && customer == null) {
 				throw new CustomException("此帳號不存在，無法更新");
 			} else {
-				Customer newCust = Customer.builder().account(req.getAccount()).address(body.address)
+				Customer newCustomer = Customer.builder().account(req.getAccount()).address(body.address)
 						.email(body.getEmail()).name(body.getName()).password(body.getPassword()).phone(body.getPhone())
 						.city(body.getCity()).district(body.getDistrict()).status(body.getStatus())
 						.token(req.getToken()).tokenExpired(body.getTokenExpired()).build();
-				Customer updCustomer = custDao.save(newCust);
-				if (updCustomer != null) {
-					custList.add(updCustomer);
-				} else {
-					return OUT.builder().custList(custList).code(HttpStatus.BAD_REQUEST.value()).msg("新增失敗").build();
-				}
-			}
+				Customer updCustomer = customerDao.save(newCustomer);
+                custList.add(updCustomer);
+            }
 			break;
 		case DELETE:
-			custDao.deleteByAccount(req.getAccount());
+			customerDao.deleteByAccount(req.getAccount());
 			break;
 		default:
 			break;
 		}
-		log.info("custList:{}", custList);
+		log.info("customerList:{}", custList);
 		return OUT.builder().custList(custList).code(HttpStatus.OK.value()).msg("execute success.").build();
 	}
 
