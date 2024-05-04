@@ -35,7 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
-src/main/resources/application.properties
 .metadata/.lock
 .metadata/version.ini
 .metadata/.mylyn/repositories.xml.zip
