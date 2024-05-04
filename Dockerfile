@@ -1,3 +1,5 @@
+# 使用具有 Java Development Kit 和 Gradle 的基礎映像
+FROM gradle:jdk11-jammy AS builder
 
 # 設置容器內的工作目錄。這是所有後續命令的基礎目錄。
 WORKDIR /home/gradle/project
