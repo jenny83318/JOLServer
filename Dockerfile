@@ -18,7 +18,7 @@ FROM eclipse-temurin:11-jdk-jammy as runtime
 EXPOSE 8080
 
 # 從構建階段複製生成的 WAR 檔案到運行階段的容器內
-COPY --from=builder /home/gradle/project/build/libs/JOLServer-1.0.3-plain.war /jolserver.war
+COPY --from=builder /home/gradle/project/build/libs/JOLServer-1.1.1-plain.war /jolserver.war
 
 # 設定容器啟動時執行的命令，使用 Java 啟動 WAR 檔案。
 ENTRYPOINT ["java", "-jar", "/jolserver.war"]
