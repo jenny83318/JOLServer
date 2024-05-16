@@ -6,6 +6,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -66,6 +67,7 @@ public class MainController {
 	}
 
 	@PostMapping("/json")
+	@CrossOrigin(origins = "https://jol-boutique.onrender.com")
 	public Object Dispatcher(@RequestBody Request req) throws Exception {
 		log.info("REQ:{}",req);
 		if (req.getFun().isEmpty()) {
@@ -122,6 +124,7 @@ public class MainController {
 
 
 	@PostMapping("/payment")
+	@CrossOrigin(origins = "https://jol-boutique.onrender.com")
 	public String paymentWithCheckoutPage(@RequestBody StripePay payment) throws StripeException {
 		init();
 		SessionCreateParams params = SessionCreateParams.builder()
