@@ -9,7 +9,7 @@ COPY . .
 
 # 执行 Gradle 构建命令，生成 WAR 文件。
 # 使用 --no-daemon 参数避免在容器中启动后台进程。
-RUN gradle build --no-daemon
+RUN gradle build
 
 # 使用 Tomcat 官方镜像作为基础镜像
 FROM tomcat:9-jdk11-openjdk-slim AS tomcat
