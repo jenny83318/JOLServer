@@ -1,7 +1,6 @@
 package com.Jenny.JOLServer.fun;
 
 import java.io.File;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
@@ -36,7 +35,7 @@ public class JOLEmailInfo {
 	private static final Logger log = LoggerFactory.getLogger(JOLEmailInfo.class);
 
 	private final JavaMailSender mailSender;
-	private final String imgURL ="https://jol-boutique.imcarpediem.com";
+	private final String imgURL ="https://github.com/jenny83318/online-shopping-ui/blob/prod/src/assets";
 	
 	@Autowired()
 	public JOLEmailInfo (JavaMailSender mailSender ) {
@@ -108,7 +107,7 @@ public class JOLEmailInfo {
 			content2.append(oriContent2
                     .replaceAll("#ProdNo", String.format("%05d", detail.getProdId()))
                     .replaceAll("#ProdName", detail.getProdName())
-                    .replaceAll("#ProdImg", imgURL+img[0])
+                    .replaceAll("#ProdImg", imgURL+img[0]+"?raw=true")
                     .replaceAll("#Size", detail.getSize())
                     .replaceAll("#Qty", Integer.toString(detail.getQty()))
                     .replaceAll("#SubTotal", Integer.toString(detail.getQty() * detail.getPrice()))
