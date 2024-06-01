@@ -2,6 +2,7 @@ package com.Jenny.JOLServer.fun;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +126,9 @@ public class JOLEmailInfo {
 
 	private static String getString(Order o, BODY body) {
 		String orderNo = String.format("%05d", o.getOrderNo());
-		String orderDate = o.getOrderTime().substring(0,10);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		String orderTime = o.getOrderTime().format(formatter);
+		String orderDate = orderTime.substring(0,10);
 		return body.getContent1()
 				.replaceAll("#OrderNo", orderNo)
 				.replaceAll("#Status", o.getStatus())

@@ -1,5 +1,7 @@
 package com.Jenny.JOLServer.model;
 
+import java.time.ZonedDateTime;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,7 +31,7 @@ public class Order {
 	@Builder.Default
 	private int totalAmt = 0;
 	@Builder.Default
-	private String orderTime = "";
+	private ZonedDateTime orderTime = null;
 	@Builder.Default
 	private String status = "";
 	@Builder.Default
@@ -63,5 +65,5 @@ public class Order {
 	@Builder.Default
 	private String payBy = "";
 	@Builder.Default
-	private String updateDt = "";
+	private ZonedDateTime updateDt = null;
 }

@@ -1,5 +1,7 @@
 package com.Jenny.JOLServer.model;
 
+import java.time.ZonedDateTime;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,7 +31,7 @@ public class OrderDetail {
 	private int price;
 	private String size;
 	private String status;
-	private String updateDt;
+	private ZonedDateTime updateDt;
 	@Transient
 	private String imgUrl;
 	@Transient

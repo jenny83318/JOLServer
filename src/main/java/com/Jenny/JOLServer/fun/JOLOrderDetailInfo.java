@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -112,11 +111,9 @@ public class JOLOrderDetailInfo {
 		case ADD:
 		case UPDATE:
 			ZonedDateTime taipeiTime = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Taipei"));
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			String now = taipeiTime.format(formatter);
 			orderDetailDao.save(OrderDetail.builder().account(req.getAccount())
 					.orderDetailNo(body.getOrderDetailNo()).orderNo(body.getOrderNo()).price(body.getPrice())
-					.prodId(body.getProdId()).qty(body.getQty()).size(body.getSize()).status(body.getStatus()).updateDt(now).build());
+					.prodId(body.getProdId()).qty(body.getQty()).size(body.getSize()).status(body.getStatus()).updateDt(taipeiTime).build());
 			break;
 		default:
 			break;
