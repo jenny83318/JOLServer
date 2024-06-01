@@ -24,7 +24,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+/**
+ * {
+    "fun": "JOLProductInfo",
+    "account": "jenny83318",
+    "type": "ALL",
+    "body": {}
+}
+ * @author Jenny
+ *
+ */
 @Service
 public class JOLProductInfo {
     private static final Logger log = LoggerFactory.getLogger(JOLProductInfo.class);
