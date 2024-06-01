@@ -1,7 +1,9 @@
 package com.Jenny.JOLServer.fun;
 
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -117,8 +119,11 @@ public class JOLEmailInfo {
 		helper.setSubject(body.getSubject());
 		helper.setText(content1 + content2 + body.getContent3(), true);
 		helper.setFrom(new InternetAddress("jolboutique12@gmail.com","JOL Boutique"));
-		File image = new File("src/main/resources/image/JOLBoutique-logo.png");
-		helper.addInline( "image", image);
+		URL imageURL = getClass().getClassLoader().getResource("image/JOLBoutique-logo.png");
+		if (imageURL != null) {
+		    File image = new File(imageURL.toURI());
+		    helper.addInline( "image", image);
+		}
 		mailSender.send(message);
 		log.info("SEND EMAIL response==========>" );
 		return OUT.builder().code(HttpStatus.OK.value()).msg("execute success.").build();
