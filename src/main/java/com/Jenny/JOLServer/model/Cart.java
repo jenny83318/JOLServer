@@ -1,5 +1,7 @@
 package com.Jenny.JOLServer.model;
 
+import java.time.ZonedDateTime;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -32,10 +34,9 @@ public class Cart {
 	@Builder.Default
 	private String size = "";
 	@Builder.Default
-	private String updateDt = "";
+	private ZonedDateTime updateDt = null;
 	@Builder.Default
 	private boolean isCart = true;
-	
 	@Transient
 	private String sizeInfo;
 	@Transient
