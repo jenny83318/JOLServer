@@ -1,7 +1,10 @@
 package com.Jenny.JOLServer.fun;
 
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +36,7 @@ public class JOLEmailInfo {
 	private static final Logger log = LoggerFactory.getLogger(JOLEmailInfo.class);
 
 	private final JavaMailSender mailSender;
+	private final String imgURL ="https://jol-boutique.imcarpediem.com";
 	
 	@Autowired()
 	public JOLEmailInfo (JavaMailSender mailSender ) {
@@ -104,7 +108,7 @@ public class JOLEmailInfo {
 			content2.append(oriContent2
                     .replaceAll("#ProdNo", String.format("%05d", detail.getProdId()))
                     .replaceAll("#ProdName", detail.getProdName())
-                    .replaceAll("#ProdImg", img[0])
+                    .replaceAll("#ProdImg", imgURL+img[0])
                     .replaceAll("#Size", detail.getSize())
                     .replaceAll("#Qty", Integer.toString(detail.getQty()))
                     .replaceAll("#SubTotal", Integer.toString(detail.getQty() * detail.getPrice()))
@@ -116,8 +120,11 @@ public class JOLEmailInfo {
 		helper.setSubject(body.getSubject());
 		helper.setText(content1 + content2 + body.getContent3(), true);
 		helper.setFrom(new InternetAddress("jolboutique12@gmail.com","JOL Boutique"));
-		File image = new File("src/main/resources/image/JOLBoutique-logo.png");
-		helper.addInline( "image", image);
+		URL imageURL = getClass().getClassLoader().getResource("image/JOLBoutique-logo.png");
+		if (imageURL != null) {
+		    File image = new File(imageURL.toURI());
+		    helper.addInline( "image", image);
+		}
 		mailSender.send(message);
 		log.info("SEND EMAIL response==========>" );
 		return OUT.builder().code(HttpStatus.OK.value()).msg("execute success.").build();
@@ -125,7 +132,9 @@ public class JOLEmailInfo {
 
 	private static String getString(Order o, BODY body) {
 		String orderNo = String.format("%05d", o.getOrderNo());
-		String orderDate = o.getOrderTime().substring(0,10);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		String orderTime = o.getOrderTime().format(formatter);
+		String orderDate = orderTime.substring(0,10);
 		return body.getContent1()
 				.replaceAll("#OrderNo", orderNo)
 				.replaceAll("#Status", o.getStatus())

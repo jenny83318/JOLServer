@@ -1,6 +1,7 @@
 package com.Jenny.JOLServer.fun;
 
 import java.lang.reflect.Field;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,8 +43,8 @@ public class JOLProductInfo {
         private String name;
         private String description;
         private String imgUrl;
-        private String updateDt;
-        private String createDt;
+        private ZonedDateTime updateDt;
+        private ZonedDateTime createDt;
         private Integer price;
         private Integer cost;
         private Integer qty;

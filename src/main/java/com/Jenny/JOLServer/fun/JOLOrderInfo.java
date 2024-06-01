@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -134,15 +133,13 @@ public class JOLOrderInfo {
 
 	public Order bodyToDB(BODY body, Request req) {
 		ZonedDateTime taipeiTime = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Taipei"));
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		String now = taipeiTime.format(formatter);
 		return Order.builder().orderNo(body.getOrderNo()).account(req.getAccount()).email(body.getEmail())
-				.totalAmt(body.getTotalAmt()).orderTime(now).status(body.getStatus()).deliveryWay(body.getDeliveryWay())
+				.totalAmt(body.getTotalAmt()).orderTime(taipeiTime).status(body.getStatus()).deliveryWay(body.getDeliveryWay())
 				.deliveryNo(body.getDeliveryNo()).orderName(body.getOrderName()).orderCity(body.getOrderCity())
 				.orderPhone(body.getOrderPhone()).orderDistrict(body.getOrderDistrict())
 				.orderAddress(body.getOrderAddress()).sendName(body.getSendName()).sendCity(body.getSendCity())
 				.sendPhone(body.getSendPhone()).sendDistrict(body.getSendDistrict()).sendAddress(body.getSendAddress())
-				.updateDt(now).vehicle(body.getVehicle()).sendPhone(body.getSendPhone())
+				.updateDt(taipeiTime).vehicle(body.getVehicle()).sendPhone(body.getSendPhone())
 				.vehicleType(body.getVehicleType()).payBy(body.getPayBy()).build();
 	}
 
