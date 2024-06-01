@@ -36,6 +36,7 @@ public class JOLEmailInfo {
 	private static final Logger log = LoggerFactory.getLogger(JOLEmailInfo.class);
 
 	private final JavaMailSender mailSender;
+	private final String imgURL ="https://jol-boutique.imcarpediem.com";
 	
 	@Autowired()
 	public JOLEmailInfo (JavaMailSender mailSender ) {
@@ -107,7 +108,7 @@ public class JOLEmailInfo {
 			content2.append(oriContent2
                     .replaceAll("#ProdNo", String.format("%05d", detail.getProdId()))
                     .replaceAll("#ProdName", detail.getProdName())
-                    .replaceAll("#ProdImg", img[0])
+                    .replaceAll("#ProdImg", imgURL+img[0])
                     .replaceAll("#Size", detail.getSize())
                     .replaceAll("#Qty", Integer.toString(detail.getQty()))
                     .replaceAll("#SubTotal", Integer.toString(detail.getQty() * detail.getPrice()))
