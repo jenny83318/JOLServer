@@ -29,6 +29,7 @@ ALTER TABLE IF EXISTS public.jol_customer
 
 -- DROP TABLE IF EXISTS public.jol_product;
 
+CREATE SEQUENCE jol_product_prodid_seq;
 CREATE TABLE IF NOT EXISTS public.jol_product
 (
     prodid integer NOT NULL DEFAULT nextval('jol_product_prodid_seq'::regclass),
@@ -56,7 +57,7 @@ ALTER TABLE IF EXISTS public.jol_product
 -- Table: public.jol_cart
 
 -- DROP TABLE IF EXISTS public.jol_cart;
-
+CREATE SEQUENCE jol_cart_cartid_seq;
 CREATE TABLE IF NOT EXISTS public.jol_cart
 (
     cartid integer NOT NULL DEFAULT nextval('jol_cart_cartid_seq'::regclass),
@@ -82,7 +83,7 @@ ALTER TABLE IF EXISTS public.jol_cart
 -- Table: public.jol_order
 
 -- DROP TABLE IF EXISTS public.jol_order;
-
+CREATE SEQUENCE jol_order_orderno_seq;
 CREATE TABLE IF NOT EXISTS public.jol_order
 (
     orderno integer NOT NULL DEFAULT nextval('jol_order_orderno_seq'::regclass),
@@ -123,7 +124,7 @@ ALTER TABLE IF EXISTS public.jol_order
 -- Table: public.jol_order_detail
 
 -- DROP TABLE IF EXISTS public.jol_order_detail;
-
+CREATE SEQUENCE jol_order_detail_orderdetailno_seq;
 CREATE TABLE IF NOT EXISTS public.jol_order_detail
 (
     orderdetailno integer NOT NULL DEFAULT nextval('jol_order_detail_orderdetailno_seq'::regclass),
@@ -151,7 +152,7 @@ ALTER TABLE IF EXISTS public.jol_order_detail
 -- Table: public.jol_employee
 
 -- DROP TABLE IF EXISTS public.jol_employee;
-
+CREATE SEQUENCE jol_employee_empno_seq;
 CREATE TABLE IF NOT EXISTS public.jol_employee
 (
     empno integer NOT NULL DEFAULT nextval('jol_employee_empno_seq'::regclass),
